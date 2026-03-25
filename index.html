@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>MarvelUs — Consultation Capture</title>
+ <script src="https://cdn.tailwindcss.com"></script>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+ <style>
+ * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+ body { background: linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%); min-height: 100vh; }
+ .glass-card { 
+ background: rgba(255, 255, 255, 0.03); 
+ backdrop-filter: blur(40px); 
+ border: 1px solid rgba(255, 255, 255, 0.06); 
+ box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.02); 
+ }
+ .btn-primary {
+ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+ transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+ }
+ .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 40px -10px rgba(102, 126, 234, 0.4); }
+ .recording-btn {
+ background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+ animation: pulse-glow 2s ease-in-out infinite;
+ }
+ @keyframes pulse-glow {
+ 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 87, 108, 0.4); }
+ 50% { box-shadow: 0 0 0 20px rgba(245, 87, 108, 0); }
+ }
+ .elegant-input {
+ background: rgba(255, 255, 255, 0.02);
+ border: 1px solid rgba(255, 255, 255, 0.08);
+ transition: all 0.3s ease;
+ }
+ .elegant-input:focus {
+ background: rgba(255, 255, 255, 0.04);
+ border-color: rgba(102, 126, 234, 0.5);
+ box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+ outline: none;
+ }
+ .fade-in { animation: fadeIn 0.5s ease forwards; }
+ @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+ 
+ /* Progress animations */
+ .progress-bar {
+ height: 4px;
+ background: linear-gradient(90deg, #667eea, #764ba2);
+ border-radius: 2px;
+ animation: progress 1.5s ease-in-out infinite;
+ width: 60%;
+ }
+ @keyframes progress {
+ 0% { transform: translateX(-100%); }
+ 50% { transform: translateX(170%); }
+ 100% { transform: translateX(-100%); }
+ }
+ 
+ .spinner {
+ width: 40px;
+ height: 40px;
+ border: 3px solid rgba(255, 255, 255, 0.1);
+ border-top-color: #667eea;
+ border-radius: 50%;
+ animation: spin 1s linear infinite;
+ }
+ @keyframes spin { to { transform: rotate(360deg); } }
+ 
+ .step-active { opacity: 1; border-color: rgba(102, 126, 234, 0.5); }
+ .step-done { opacity: 1; }
+ .step-pending { opacity: 0.4; }
+ 
+ /* Error state */
+ .error-card {
+ background: rgba(239, 68, 68, 0.05);
+ border: 1px solid rgba(239, 68, 68, 0.2);
+ }
+ </style>
+</head>
+<body class="text-white">
+ <div class="min-h-screen flex flex-col items-center justify-center p-6">
+ 
+ <!-- Header -->
+ <header class="mb-10 text-center fade-in">
+ <div class="flex items-center justify-center gap-3 mb-3">
+ <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-xl">✦</div>
+ <span class="text-2xl font-semibold tracking-tight">MarvelUs</span>
+ </div>
+ <p class="text-gray-500 text-sm font-light tracking-wide uppercase">Consultation Capture</p>
+ </header>
+
+ <!-- Main Card -->
+ <div id="main-card" class="glass-card rounded-3xl p-8 w-full max-w-md fade-in">
+ 
+ <!-- STATE 1: Setup -->
+ <div id="state-setup">
+ <div class="mb-6 p-4 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+ <p class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">What you'll receive</p>
+ <div class="flex gap-4 text-sm text-gray-400">
+ <span>📝 Full transcript</span>
+ <span>✉️ Email draft</span>
+ </div>
+ </div>
+ 
+ <div class="mb-6">
+ <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Client Name</label>
+ <input type="text" id="clientName" placeholder="Enter client name" class="elegant-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-600">
+ </div>
+ 
+ <div class="text-center py-6">
+ <button id="recordBtn" onclick="startRecording()" class="w-28 h-28 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border border-white/10 flex items-center justify-center text-4xl mx-auto hover:scale-105 transition-transform">
+ 🎙️
+ </button>
+ <p id="statusText" class="mt-4 text-gray-400 font-medium">Tap to start recording</p>
+ <p id="timer" class="mt-2 text-5xl font-light text-white/90 font-mono">00:00</p>
+ </div>
+ </div>
+
+ <!-- STATE 2: Recording -->
+ <div id="state-recording" class="hidden text-center py-6">
+ <div class="w-28 h-28 rounded-full recording-btn flex items-center justify-center text-4xl mx-auto mb-4">
+ 🔴
+ </div>
+ <p class="text-gray-400 font-medium mb-2">Recording...</p>
+ <p id="recordingTimer" class="text-5xl font-light text-white font-mono mb-6">00:00</p>
+ <button onclick="stopRecording()" class="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full font-medium transition-colors">
+ Stop Recording
+ </button>
+ </div>
+
+ <!-- STATE 3: Uploading (CLEAR VISIBLE FEEDBACK) -->
+ <div id="state-uploading" class="hidden py-8">
+ <div class="text-center mb-6">
+ <div class="spinner mx-auto mb-4"></div>
+ <p class="text-lg font-medium text-white mb-1">Uploading...</p>
+ <p class="text-sm text-gray-500">Sending to server</p>
+ </div>
+ <div class="h-1 bg-gray-800 rounded-full overflow-hidden">
+ <div class="progress-bar"></div>
+ </div>
+ </div>
+
+ <!-- STATE 4: Processing Steps -->
+ <div id="state-processing" class="hidden py-4">
+ <div class="text-center mb-6">
+ <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 mb-2">
+ <span class="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
+ <span class="text-sm text-violet-300">AI Processing</span>
+ </div>
+ <p class="text-xs text-gray-500">This takes 10-30 seconds</p>
+ </div>
+ 
+ <div class="space-y-3" id="processingSteps">
+ <div class="step flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]" data-step="1">
+ <div class="step-icon w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-sm">🎯</div>
+ <div class="flex-1">
+ <p class="text-sm font-medium">Transcribing audio</p>
+ </div>
+ <div class="step-status">
+ <div class="w-4 h-4 rounded-full border-2 border-violet-500/30 border-t-violet-500 animate-spin"></div>
+ </div>
+ </div>
+ 
+ <div class="step flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] opacity-40" data-step="2">
+ <div class="step-icon w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-sm">📝</div>
+ <div class="flex-1">
+ <p class="text-sm font-medium">Extracting key points</p>
+ </div>
+ <div class="step-status">
+ <div class="w-4 h-4 rounded-full border-2 border-gray-700"></div>
+ </div>
+ </div>
+ 
+ <div class="step flex items-center gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] opacity-40" data-step="3">
+ <div class="step-icon w-8 h-8 rounded-lg bg-gray-800 flex items-center justify-center text-sm">✉️</div>
+ <div class="flex-1">
+ <p class="text-sm font-medium">Drafting email</p>
+ </div>
+ <div class="step-status">
+ <div class="w-4 h-4 rounded-full border-2 border-gray-700"></div>
+ </div>
+ </div>
+ </div>
+ </div>
+
+ <!-- STATE 5: Error -->
+ <div id="state-error" class="hidden py-6">
+ <div class="error-card rounded-xl p-6 text-center">
+ <div class="text-4xl mb-3">⚠️</div>
+ <h3 class="text-lg font-semibold text-red-400 mb-2">Something went wrong</h3>
+ <p id="errorText" class="text-sm text-gray-400 mb-4">Unable to process recording</p>
+ <div class="flex gap-3 justify-center">
+ <button onclick="retryRecording()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-medium text-sm">Try Again</button>
+ <button onclick="resetAll()" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium text-sm">Start Over</button>
+ </div>
+ </div>
+ </div>
+
+ <!-- STATE 6: Results -->
+ <div id="state-results" class="hidden">
+ <div class="flex items-center gap-3 mb-4 pb-4 border-b border-white/[0.06]">
+ <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">✓</div>
+ <div>
+ <h2 class="font-semibold">Done!</h2>
+ <p id="resultMeta" class="text-xs text-gray-500"></p>
+ </div>
+ </div>
+ 
+ <div class="mb-4">
+ <div class="flex justify-between items-center mb-2">
+ <h3 class="text-xs font-medium text-gray-500 uppercase">Transcription</h3>
+ <button onclick="copyText('transcript')" class="text-xs text-violet-400 hover:text-violet-300">Copy</button>
+ </div>
+ <div class="bg-white/[0.02] rounded-xl p-4 max-h-40 overflow-y-auto">
+ <pre id="transcriptDisplay" class="text-sm text-gray-300 whitespace-pre-wrap"></pre>
+ </div>
+ </div>
+ 
+ <div class="mb-4">
+ <div class="flex justify-between items-center mb-2">
+ <h3 class="text-xs font-medium text-gray-500 uppercase">Email Draft</h3>
+ <button onclick="copyText('email')" class="text-xs text-violet-400 hover:text-violet-300">Copy</button>
+ </div>
+ <div class="bg-white/[0.02] rounded-xl p-4 max-h-48 overflow-y-auto">
+ <pre id="emailDisplay" class="text-sm text-gray-300 whitespace-pre-wrap"></pre>
+ </div>
+ </div>
+ 
+ <div class="flex gap-3">
+ <button onclick="downloadResults()" class="flex-1 btn-primary py-3 rounded-xl font-medium">Download</button>
+ <button onclick="resetAll()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-xl font-medium">New</button>
+ </div>
+ </div>
+
+ </div>
+
+ <footer class="mt-10 text-center">
+ <p class="text-gray-600 text-xs">Powered by MarvelUs • Local processing</p>
+ </footer>
+ </div>
+
+ <script>
+ let mediaRecorder, audioChunks = [], stream, timerInterval, seconds = 0;
+ let currentFilename = null;
+ let checkInterval = null;
+ 
+ const WEBHOOK_URL = 'https://partible-nonactionable-tyrell.ngrok-free.de/webhook/consultation';
+ const STATUS_URL = 'https://partible-nonactionable-tyrell.ngrok-free.de/webhook/status';
+ 
+ function showState(stateName) {
+ // Hide all states
+ ['setup', 'recording', 'uploading', 'processing', 'error', 'results'].forEach(s => {
+ document.getElementById(`state-${s}`).classList.add('hidden');
+ });
+ // Show requested state
+ document.getElementById(`state-${stateName}`).classList.remove('hidden');
+ }
+ 
+ async function startRecording() {
+ try {
+ stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+ } catch (err) {
+ alert('Please allow microphone access');
+ return;
+ }
+ 
+ mediaRecorder = new MediaRecorder(stream);
+ audioChunks = [];
+ seconds = 0;
+ 
+ mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+ mediaRecorder.onstop = () => {
+ stream.getTracks().forEach(t => t.stop());
+ const blob = new Blob(audioChunks, { type: 'audio/webm' });
+ uploadRecording(blob);
+ };
+ 
+ mediaRecorder.start(1000);
+ showState('recording');
+ 
+ timerInterval = setInterval(() => {
+ seconds++;
+ const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+ const sec = String(seconds % 60).padStart(2, '0');
+ document.getElementById('recordingTimer').textContent = `${min}:${sec}`;
+ }, 1000);
+ }
+ 
+ function stopRecording() {
+ clearInterval(timerInterval);
+ mediaRecorder.stop();
+ showState('uploading');
+ }
+ 
+ async function uploadRecording(blob) {
+ const formData = new FormData();
+ formData.append('audio', blob, 'recording.webm');
+ formData.append('clientName', document.getElementById('clientName').value || 'Client');
+ formData.append('duration', document.getElementById('recordingTimer').textContent);
+ 
+ try {
+ const response = await fetch(WEBHOOK_URL, { method: 'POST', body: formData });
+ 
+ if (!response.ok) throw new Error(`Server error: ${response.status}`);
+ 
+ const result = await response.json();
+ if (!result.success) throw new Error(result.error || 'Upload failed');
+ 
+ currentFilename = result.filename;
+ showState('processing');
+ startCheckingStatus();
+ 
+ } catch (err) {
+ console.error('Upload error:', err);
+ document.getElementById('errorText').textContent = err.message;
+ showState('error');
+ }
+ }
+ 
+ function startCheckingStatus() {
+ let checkCount = 0;
+ const maxChecks = 40;
+ 
+ checkInterval = setInterval(async () => {
+ checkCount++;
+ 
+ try {
+ const res = await fetch(`${STATUS_URL}?file=${currentFilename}`);
+ const data = await res.json();
+ 
+ if (data.status === 'done' && data.results) {
+ clearInterval(checkInterval);
+ showResults(data.results);
+ return;
+ }
+ 
+ // Animate steps based on time
+ updateProcessingSteps(checkCount);
+ 
+ } catch (err) {
+ console.log('Check failed:', err);
+ }
+ 
+ if (checkCount >= maxChecks) {
+ clearInterval(checkInterval);
+ document.getElementById('errorText').textContent = 'Processing took too long. Please try again.';
+ showState('error');
+ }
+ }, 3000);
+ }
+ 
+ function updateProcessingSteps(count) {
+ const steps = document.querySelectorAll('#processingSteps .step');
+ 
+ if (count > 1) {
+ steps[0].classList.remove('opacity-40');
+ steps[0].querySelector('.step-icon').innerHTML = '✓';
+ steps[0].querySelector('.step-icon').classList.add('bg-emerald-500/20', 'text-emerald-400');
+ steps[0].querySelector('.step-status').innerHTML = '';
+ }
+ if (count > 3) {
+ steps[1].classList.remove('opacity-40');
+ steps[1].querySelector('.step-icon').classList.add('animate-pulse');
+ }
+ if (count > 6) {
+ steps[1].classList.remove('opacity-40');
+ steps[1].querySelector('.step-icon').innerHTML = '✓';
+ steps[1].querySelector('.step-icon').classList.add('bg-emerald-500/20', 'text-emerald-400');
+ steps[1].querySelector('.step-status').innerHTML = '';
+ steps[2].classList.remove('opacity-40');
+ }
+ }
+ 
+ function showResults(results) {
+ document.getElementById('resultMeta').textContent = `${results.clientName} • ${new Date().toLocaleDateString()}`;
+ document.getElementById('transcriptDisplay').textContent = results.transcript;
+ document.getElementById('emailDisplay').textContent = results.email;
+ showState('results');
+ }
+ 
+ function copyText(type) {
+ const text = document.getElementById(type + 'Display').textContent;
+ navigator.clipboard.writeText(text);
+ alert('Copied!');
+ }
+ 
+ function downloadResults() {
+ const transcript = document.getElementById('transcriptDisplay').textContent;
+ const email = document.getElementById('emailDisplay').textContent;
+ const blob = new Blob([`TRANSCRIPT:\n\n${transcript}\n\n---\n\nEMAIL:\n\n${email}`], { type: 'text/plain' });
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `consultation-${new Date().toISOString().slice(0,10)}.txt`;
+ a.click();
+ URL.revokeObjectURL(url);
+ }
+ 
+ function retryRecording() {
+ showState('setup');
+ }
+ 
+ function resetAll() {
+ clearInterval(checkInterval);
+ audioChunks = [];
+ seconds = 0;
+ currentFilename = null;
+ document.getElementById('clientName').value = '';
+ document.getElementById('timer').textContent = '00:00';
+ 
+ // Reset step icons
+ document.querySelectorAll('#processingSteps .step').forEach((step, i) => {
+ step.classList.add('opacity-40');
+ step.querySelector('.step-icon').innerHTML = ['🎯', '📝', '✉️'][i];
+ step.querySelector('.step-icon').classList.remove('bg-emerald-500/20', 'text-emerald-400');
+ step.querySelector('.step-status').innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-gray-700"></div>';
+ });
+ 
+ showState('setup');
+ }
+ </script>
+</body>
+</html>
