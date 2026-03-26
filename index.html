@@ -1,1165 +1,2084 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>MarvelUs — Consultation Recorder</title>
- <link rel="preconnect" href="https://fonts.googleapis.com">
- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
- <style>
- :root{
-  --navy: #0A192F;
-  --offwhite: #FAFBFC;
-  --muted: rgba(10, 25, 47, 0.62);
-  --hairline: rgba(10, 25, 47, 0.10);
-  --card: rgba(250, 251, 252, 0.82);
-  --shadow: 0 24px 60px rgba(10, 25, 47, 0.14);
-  --accent: #FF6B6B;
-  --accent2: #ff8a72;
- }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MarvelUs — The Invisible Consultation Assistant</title>
+    <meta
+      name="description"
+      content="Local AI that captures every detail of your beauty consultations. Secure, seamless, present."
+    />
 
- * { box-sizing: border-box; }
- html, body { height: 100%; }
- body {
-  margin: 0;
-  background: var(--offwhite);
-  color: var(--navy);
-  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
- }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap"
+      rel="stylesheet"
+    />
 
- .hidden { display: none !important; }
+    <style>
+      :root {
+        /* Core Palette: Neural Elegance */
+        --bg-primary: #050508;
+        --bg-secondary: #0a0a0f;
+        --bg-elevated: #12121a;
+        --text-primary: #ffffff;
+        --text-secondary: rgba(255, 255, 255, 0.6);
+        --text-tertiary: rgba(255, 255, 255, 0.4);
 
- .page { min-height: 100%; }
+        /* Accent: Bioluminescent Cyan to Violet */
+        --accent-cyan: #00f0ff;
+        --accent-violet: #b829dd;
+        --accent-warm: #ff6b9d;
+        --glow-cyan: rgba(0, 240, 255, 0.4);
+        --glow-violet: rgba(184, 41, 221, 0.4);
 
- .nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  background: rgba(250, 251, 252, 0.72);
-  border-bottom: 1px solid var(--hairline);
- }
- .nav-inner{
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 14px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
- }
- .brand{
-  display: inline-flex;
-  align-items: baseline;
-  gap: 10px;
-  text-decoration: none;
-  color: inherit;
- }
- .brand-mark{
-  letter-spacing: -0.02em;
-  font-weight: 600;
- }
- .brand-tag{
-  font-weight: 400;
-  color: var(--muted);
-  font-size: 13px;
- }
- .nav-links{
-  display: none;
-  gap: 18px;
-  align-items: center;
- }
- .nav-links a{
-  font-size: 13px;
-  color: var(--muted);
-  text-decoration: none;
- }
- .nav-links a:hover{ color: var(--navy); }
- @media (min-width: 900px){
-  .nav-links{ display: inline-flex; }
- }
+        /* Typography Scale (Apple-style 1.25 ratio) */
+        --text-xs: 0.75rem; /* 12px */
+        --text-sm: 0.875rem; /* 14px */
+        --text-base: 1rem; /* 16px */
+        --text-lg: 1.125rem; /* 18px */
+        --text-xl: 1.25rem; /* 20px */
+        --text-2xl: 1.5rem; /* 24px */
+        --text-3xl: 1.875rem; /* 30px */
+        --text-4xl: 2.25rem; /* 36px */
+        --text-5xl: 3rem; /* 48px */
+        --text-6xl: 3.75rem; /* 60px */
+        --text-7xl: 4.5rem; /* 72px */
 
- .btn{
-  appearance: none;
-  border: 1px solid rgba(10, 25, 47, 0.10);
-  background: rgba(10, 25, 47, 0.02);
-  color: var(--navy);
-  border-radius: 9999px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
- }
- .btn:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(10, 25, 47, 0.10);
-  border-color: rgba(10, 25, 47, 0.16);
- }
- .btn-primary{
-  border: 0;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: white;
- }
+        /* Animation Timing */
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
+      }
 
- .hero{
-  position: relative;
-  min-height: 100vh;
-  padding: 96px 18px 44px;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
- }
- .hero-inner{
-  max-width: 1120px;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-  align-items: center;
- }
- @media (min-width: 980px){
-  .hero-inner{ grid-template-columns: 1.1fr 0.9fr; }
- }
- .hero-title{
-  letter-spacing: -0.03em;
-  font-weight: 600;
-  margin: 0 0 12px;
-  line-height: 1.04;
-  font-size: clamp(42px, 5vw, 64px);
- }
- .hero-sub{
-  margin: 0 0 18px;
-  font-size: 16px;
-  font-weight: 300;
-  color: var(--muted);
-  max-width: 54ch;
- }
- .hero-ctas{ display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
- .scroll-indicator{
-  margin-top: 24px;
-  height: 28px;
-  width: 1px;
-  background: rgba(10, 25, 47, 0.20);
-  position: relative;
-  overflow: hidden;
- }
- .scroll-indicator::after{
-  content:"";
-  position:absolute;
-  left:0; top:-12px;
-  height: 12px;
-  width: 1px;
-  background: rgba(10, 25, 47, 0.55);
-  animation: scrollLine 1.6s ease-in-out infinite;
- }
- @keyframes scrollLine{
-  0%{ transform: translateY(0); opacity: 0; }
-  20%{ opacity: 1; }
-  60%{ opacity: 1; }
-  100%{ transform: translateY(40px); opacity: 0; }
- }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
- .wave-canvas{
-  position: absolute;
-  inset: 0;
-  opacity: 0.22;
-  pointer-events: none;
-  filter: blur(0px);
- }
- .hero-glow{
-  position: absolute;
-  inset: -20%;
-  background:
-    radial-gradient(closest-side at 18% 20%, rgba(255,107,107,0.22), transparent 55%),
-    radial-gradient(closest-side at 78% 32%, rgba(255,138,114,0.16), transparent 60%),
-    radial-gradient(closest-side at 55% 78%, rgba(10,25,47,0.09), transparent 62%);
-  pointer-events: none;
- }
+      html {
+        scroll-behavior: smooth;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 400;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
 
- .moment-section{
-  padding: 70px 18px;
-  border-top: 1px solid var(--hairline);
- }
- .moment-inner{
-  max-width: 1120px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 22px;
- }
- @media (min-width: 980px){
-  .moment-inner{ grid-template-columns: 1fr 1fr; gap: 36px; }
- }
- .moment-kicker{
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 0 0 10px;
- }
- .moment-title{
-  margin: 0 0 10px;
-  letter-spacing: -0.02em;
-  font-weight: 600;
-  font-size: clamp(24px, 3vw, 34px);
- }
- .moment-copy{
-  margin: 0;
-  font-size: 16px;
-  font-weight: 300;
-  color: var(--muted);
-  max-width: 62ch;
- }
- .watermark{
-  position: relative;
- }
- .watermark::before{
-  content: attr(data-no);
-  position: absolute;
-  top: -26px;
-  left: -4px;
-  font-size: 72px;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  color: rgba(10, 25, 47, 0.06);
-  pointer-events: none;
- }
- .moment-card{
-  border: 1px solid var(--hairline);
-  border-radius: 22px;
-  background: rgba(250, 251, 252, 0.65);
-  box-shadow: 0 18px 44px rgba(10, 25, 47, 0.08);
-  padding: 18px;
-  min-height: 168px;
- }
- .poetry{
-  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Inter";
-  font-size: 14px;
-  color: rgba(10, 25, 47, 0.78);
-  line-height: 1.55;
-  white-space: pre-wrap;
- }
+      ::selection {
+        background: var(--accent-cyan);
+        color: var(--bg-primary);
+      }
 
- .trust{
-  padding: 44px 18px 80px;
-  border-top: 1px solid var(--hairline);
- }
- .trust-inner{
-  max-width: 1120px;
-  margin: 0 auto;
- }
- .trust-row{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  padding: 18px;
-  border: 1px solid var(--hairline);
-  border-radius: 18px;
-  background: rgba(10, 25, 47, 0.02);
- }
- @media (min-width: 860px){
-  .trust-row{
-   grid-template-columns: 1fr 1fr 1fr;
-   gap: 12px;
-  }
- }
- .trust-item{
-  font-size: 14px;
-  color: rgba(10, 25, 47, 0.80);
-  font-weight: 500;
-  letter-spacing: -0.01em;
- }
- .trust-item span{
-  font-weight: 400;
-  color: var(--muted);
- }
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-primary);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--bg-elevated);
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-tertiary);
+      }
 
- .recorder-wrap{
-  position: relative;
- }
- .recorder-shell{
-  width: 100%;
-  max-width: 420px;
-  margin-left: auto;
-  padding-top: 16px;
- }
- @media (max-width: 979px){
-  .recorder-shell{ margin-right: auto; }
- }
- .recorder-card{
-  background: var(--card);
-  border: 1px solid rgba(10, 25, 47, 0.10);
-  border-radius: 26px;
-  padding: 18px;
-  box-shadow: var(--shadow);
- }
+      /* === LAYOUT PRIMITIVES === */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
 
- .recorder-top{
-  text-align: left;
-  margin-bottom: 14px;
- }
- .recorder-top .mini{
-  font-size: 12px;
-  color: var(--muted);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin: 0 0 8px;
- }
- .recorder-top .promise{
-  font-size: 14px;
-  font-weight: 300;
-  color: var(--muted);
-  margin: 0;
- }
+      .section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        padding: 120px 0;
+      }
 
- .field{
-  width: 100%;
-  background: rgba(250, 251, 252, 0.85);
-  border: 1px solid rgba(10, 25, 47, 0.14);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  color: var(--navy);
-  font-size: 15px;
-  outline: none;
-  transition: box-shadow 120ms ease, border-color 120ms ease;
- }
- .field:focus{
-  border-color: rgba(255, 107, 107, 0.55);
-  box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.14);
- }
- .pill{
-  border-radius: 9999px;
- }
+      /* === TYPOGRAPHY === */
+      .eyebrow {
+        font-size: var(--text-xs);
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+        margin-bottom: 1.5rem;
+        display: block;
+      }
 
- @keyframes spin { to { transform: rotate(360deg); } }
- .spinner { border: 3px solid rgba(10,25,47,0.12); border-top-color: var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+      .headline-hero {
+        font-size: clamp(48px, 8vw, 80px);
+        font-weight: 300;
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(
+          135deg,
+          #fff 0%,
+          rgba(255, 255, 255, 0.7) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
 
- @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
- .animate-pulse { animation: pulse 2s infinite; }
- .progress-bar { height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; animation: progress 2s ease-in-out infinite; width: 60%; }
- @keyframes progress { 0% { transform: translateX(-100%); } 50% { transform: translateX(200%); } 100% { transform: translateX(-100%); } }
+      .headline-section {
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 300;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.5rem;
+      }
 
- .icon-btn{
-  background: rgba(10,25,47,0.03);
-  border: 1px solid rgba(10,25,47,0.10);
-  padding: 0.35rem 0.6rem;
-  border-radius: 0.6rem;
-  color: rgba(10,25,47,0.85);
-  cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 500;
- }
- .icon-btn:hover{ border-color: rgba(10,25,47,0.16); }
+      .subheadline {
+        font-size: var(--text-xl);
+        line-height: 1.6;
+        color: var(--text-secondary);
+        font-weight: 300;
+        max-width: 600px;
+        margin-bottom: 3rem;
+      }
 
- .soft-panel{
-  background: rgba(10,25,47,0.03);
-  border: 1px solid rgba(10,25,47,0.08);
-  border-radius: 14px;
-  padding: 12px;
- }
- .soft-panel strong{ font-weight: 600; }
+      .body-large {
+        font-size: var(--text-lg);
+        line-height: 1.7;
+        color: var(--text-secondary);
+        font-weight: 400;
+      }
 
- .footer{
-  padding: 22px 18px 30px;
-  color: rgba(10,25,47,0.50);
-  font-size: 12px;
-  border-top: 1px solid var(--hairline);
- }
- .footer-inner{
-  max-width: 1120px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
- }
- .footer a{ color: inherit; text-decoration: none; }
- .footer a:hover{ color: rgba(10,25,47,0.75); }
- </style>
-</head>
-<body>
-<div class="page">
-  <header class="nav" role="banner">
-    <div class="nav-inner">
-      <a class="brand" href="#top" aria-label="MarvelUs">
-        <span class="brand-mark">MarvelUs</span>
-        <span class="brand-tag">Conversations worth keeping</span>
-      </a>
-      <nav class="nav-links" aria-label="Primary">
-        <a href="#how">How it works</a>
-        <a href="#privacy">Privacy</a>
-        <a href="#providers">For providers</a>
-      </nav>
-      <button class="btn btn-primary" type="button" onclick="scrollToRecorder()">Get MarvelUs</button>
-    </div>
-  </header>
+      .italic-accent {
+        font-family: "Playfair Display", serif;
+        font-style: italic;
+        font-weight: 400;
+        color: var(--accent-warm);
+      }
 
-  <main id="top">
-    <section class="hero" aria-label="Hero">
-      <div class="hero-glow" aria-hidden="true"></div>
-      <canvas id="wave" class="wave-canvas" aria-hidden="true"></canvas>
-      <div class="hero-inner">
-        <div>
-          <h1 class="hero-title">Never miss a word that matters</h1>
-          <p class="hero-sub">MarvelUs turns consultations into clear, actionable takeaways—so you can focus on the person in front of you, not your notes.</p>
-          <div class="hero-ctas">
-            <button class="btn btn-primary" type="button" onclick="scrollToRecorder()">Begin your first recording</button>
-            <a class="btn" href="#privacy" style="text-decoration:none; display:inline-flex; align-items:center;">Privacy, in plain English</a>
+      /* === FLOAT + MAGNETIC (avoid transform conflicts) === */
+      .float-wrap {
+        display: inline-flex;
+        animation: float 6s var(--ease-in-out-sine) infinite;
+        will-change: transform;
+      }
+
+      /* === THE GLOW BUTTON === */
+      .cta-container {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .neural-button {
+        position: relative;
+        padding: 20px 48px;
+        font-size: var(--text-base);
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 100px;
+        cursor: pointer;
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        transition: transform 0.35s var(--ease-out-expo),
+          background 0.4s var(--ease-out-expo),
+          box-shadow 0.4s var(--ease-out-expo),
+          border-color 0.4s var(--ease-out-expo);
+        box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.1),
+          0 20px 40px -10px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        will-change: transform;
+      }
+
+      .neural-button::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: 100px;
+        padding: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-cyan),
+          var(--accent-violet),
+          var(--accent-cyan)
+        );
+        background-size: 200% 100%;
+        animation: borderRotate 4s linear infinite;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0.8;
+      }
+
+      .neural-button::after {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: 100px;
+        background: radial-gradient(
+          circle at center,
+          var(--glow-cyan) 0%,
+          transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+        filter: blur(20px);
+      }
+
+      .button-shimmer {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transform: skewX(-20deg);
+        animation: shimmer 5s infinite;
+      }
+
+      .neural-button:hover {
+        transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 0 60px var(--glow-cyan),
+          0 20px 40px -10px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .neural-button:hover::after {
+        opacity: 0.6;
+        animation: pulse 2s var(--ease-in-out-sine) infinite;
+      }
+
+      .neural-button:active {
+        transform: scale(0.98);
+      }
+
+      .button-text {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .button-icon {
+        width: 20px;
+        height: 20px;
+        transition: transform 0.3s var(--ease-out-expo);
+      }
+
+      .neural-button:hover .button-icon {
+        transform: translateX(4px);
+      }
+
+      .trust-badge {
+        font-size: var(--text-xs);
+        color: var(--text-tertiary);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.8;
+      }
+
+      .trust-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: #00ff88;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #00ff88;
+        animation: breathe 3s ease-in-out infinite;
+      }
+
+      /* === NAVIGATION === */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 24px 0;
+        transition: all 0.4s var(--ease-out-expo);
+      }
+
+      nav.scrolled {
+        background: rgba(5, 5, 8, 0.8);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 16px 0;
+      }
+
+      .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: var(--text-xl);
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        text-decoration: none;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-cyan),
+          var(--accent-violet)
+        );
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+      }
+
+      .nav-link {
+        font-size: var(--text-sm);
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+        font-weight: 400;
+      }
+
+      .nav-link:hover {
+        color: var(--text-primary);
+      }
+
+      .nav-cta {
+        padding: 10px 24px;
+        font-size: var(--text-sm);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 100px;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .nav-cta:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      /* === HERO SECTION === */
+      .hero {
+        position: relative;
+        background: radial-gradient(
+          ellipse at 50% 0%,
+          rgba(0, 240, 255, 0.15) 0%,
+          transparent 50%
+        );
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-visual {
+        position: relative;
+        height: 600px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .neural-orb {
+        width: 400px;
+        height: 400px;
+        position: relative;
+      }
+
+      .neural-orb::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at 30% 30%,
+          var(--accent-cyan) 0%,
+          transparent 60%
+        );
+        opacity: 0.3;
+        filter: blur(60px);
+        animation: breathe 8s ease-in-out infinite;
+      }
+
+      .neural-orb::after {
+        content: "";
+        position: absolute;
+        inset: 20%;
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 50%;
+        animation: pulse-ring 4s var(--ease-out-expo) infinite;
+      }
+
+      /* === SECTION: THE FLOW === */
+      .flow-section {
+        background: var(--bg-secondary);
+      }
+
+      .flow-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+        margin-top: 80px;
+      }
+
+      .flow-card {
+        padding: 48px 32px;
+        background: var(--bg-elevated);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s var(--ease-out-expo);
+      }
+
+      .flow-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent-cyan),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .flow-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+      }
+
+      .flow-card:hover::before {
+        opacity: 1;
+      }
+
+      .flow-number {
+        font-size: var(--text-sm);
+        font-weight: 600;
+        color: var(--accent-violet);
+        margin-bottom: 24px;
+        display: block;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .flow-title {
+        font-size: var(--text-2xl);
+        font-weight: 500;
+        margin-bottom: 16px;
+        letter-spacing: -0.01em;
+      }
+
+      .flow-desc {
+        font-size: var(--text-base);
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* === SECTION: THE VAULT === */
+      .vault-section {
+        background: linear-gradient(180deg, var(--bg-secondary) 0%, #0f0f1a 100%);
+        position: relative;
+      }
+
+      .vault-section::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 100%,
+          rgba(184, 41, 221, 0.1) 0%,
+          transparent 50%
+        );
+      }
+
+      .vault-content {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .vault-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 40px;
+        background: rgba(0, 240, 255, 0.1);
+        border: 1px solid rgba(0, 240, 255, 0.2);
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+      }
+
+      .security-badges {
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        margin-top: 48px;
+        flex-wrap: wrap;
+      }
+
+      .security-badge {
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 100px;
+        font-size: var(--text-sm);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* === SECTION: PREVIEW === */
+      .preview-section {
+        background: var(--bg-primary);
+      }
+
+      .preview-container {
+        background: var(--bg-elevated);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 32px;
+        padding: 48px;
+        margin-top: 64px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .preview-label {
+        font-size: var(--text-sm);
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .preview-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: var(--text-sm);
+        color: var(--accent-cyan);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--accent-cyan);
+        animation: pulse 2s infinite;
+      }
+
+      .transcript-preview {
+        font-family: "Inter", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: var(--text-base);
+        line-height: 2;
+        color: var(--text-secondary);
+      }
+
+      .transcript-line {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 8px;
+        opacity: 0;
+        animation: fadeSlideIn 0.5s var(--ease-out-expo) forwards;
+      }
+
+      .transcript-line:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .transcript-line:nth-child(2) {
+        animation-delay: 0.3s;
+      }
+      .transcript-line:nth-child(3) {
+        animation-delay: 0.5s;
+      }
+      .transcript-line:nth-child(4) {
+        animation-delay: 0.7s;
+      }
+
+      .timestamp {
+        color: var(--text-tertiary);
+        font-size: var(--text-sm);
+        font-variant-numeric: tabular-nums;
+        min-width: 50px;
+      }
+
+      .speaker {
+        color: var(--accent-warm);
+        font-weight: 500;
+        min-width: 60px;
+      }
+
+      .text {
+        color: var(--text-primary);
+        font-weight: 300;
+      }
+
+      /* === FINAL CTA SECTION === */
+      .final-cta {
+        background: radial-gradient(
+          ellipse at 50% 50%,
+          rgba(0, 240, 255, 0.1) 0%,
+          transparent 60%
+        );
+        text-align: center;
+        min-height: 80vh;
+      }
+
+      .final-cta-content {
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .final-cta .neural-button {
+        padding: 24px 64px;
+        font-size: var(--text-lg);
+        margin-top: 48px;
+      }
+
+      /* === FOOTER === */
+      footer {
+        padding: 60px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        text-align: center;
+        color: var(--text-tertiary);
+        font-size: var(--text-sm);
+      }
+
+      /* === ANIMATIONS === */
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-12px) rotate(0.5deg);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.4;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.8;
+          transform: scale(1.1);
+        }
+      }
+
+      @keyframes borderRotate {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 200% 50%;
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          left: -100%;
+        }
+        20% {
+          left: 200%;
+        }
+        100% {
+          left: 200%;
+        }
+      }
+
+      @keyframes breathe {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.6;
+          transform: scale(1.05);
+        }
+      }
+
+      @keyframes pulse-ring {
+        0% {
+          transform: scale(0.8);
+          opacity: 0.5;
+        }
+        100% {
+          transform: scale(1.3);
+          opacity: 0;
+        }
+      }
+
+      @keyframes fadeSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* === SCROLL REVEAL === */
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s var(--ease-out-expo);
+      }
+
+      .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* === RESPONSIVE === */
+      @media (max-width: 968px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+          gap: 60px;
+        }
+
+        .flow-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .nav-links {
+          display: none;
+        }
+
+        .hero-visual {
+          height: 300px;
+          order: -1;
+        }
+
+        .neural-orb {
+          width: 250px;
+          height: 250px;
+        }
+      }
+
+      /* === UTILITY === */
+      .text-gradient {
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      /* === RECORDER (APP FLOW) === */
+      .hidden {
+        display: none !important;
+      }
+
+      .recorder-section {
+        background: radial-gradient(
+            ellipse at 50% 0%,
+            rgba(184, 41, 221, 0.1) 0%,
+            transparent 55%
+          ),
+          var(--bg-secondary);
+      }
+
+      .recorder-grid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 72px;
+        align-items: start;
+      }
+
+      .recorder-kicker {
+        font-size: var(--text-sm);
+        color: var(--text-tertiary);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+
+      .recorder-title {
+        font-size: clamp(32px, 4vw, 52px);
+        font-weight: 300;
+        letter-spacing: -0.02em;
+        line-height: 1.08;
+        margin-bottom: 18px;
+      }
+
+      .recorder-copy {
+        color: var(--text-secondary);
+        font-size: var(--text-lg);
+        line-height: 1.7;
+        max-width: 62ch;
+      }
+
+      .recorder-shell {
+        width: 100%;
+        max-width: 460px;
+        margin-left: auto;
+      }
+
+      .recorder-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 28px;
+        padding: 18px;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45),
+          0 0 0 1px rgba(0, 240, 255, 0.06);
+      }
+
+      .soft-panel {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 14px;
+      }
+
+      .field {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: var(--text-primary);
+        font-size: var(--text-base);
+        outline: none;
+        transition: border-color 140ms ease, box-shadow 140ms ease;
+      }
+
+      .field::placeholder {
+        color: rgba(255, 255, 255, 0.42);
+      }
+
+      .field:focus {
+        border-color: rgba(0, 240, 255, 0.55);
+        box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.12);
+      }
+
+      .icon-btn {
+        appearance: none;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 8px 12px;
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        font-size: var(--text-sm);
+        font-weight: 500;
+        transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+      }
+
+      .icon-btn:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.16);
+      }
+
+      .danger {
+        background: rgba(255, 107, 107, 0.18) !important;
+        border-color: rgba(255, 107, 107, 0.35) !important;
+      }
+
+      .spinner {
+        border: 3px solid rgba(255, 255, 255, 0.16);
+        border-top-color: var(--accent-cyan);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .progress-track {
+        margin-top: 16px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 9999px;
+        overflow: hidden;
+      }
+
+      .progress-bar {
+        height: 4px;
+        width: 55%;
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+        border-radius: 9999px;
+        animation: progress 2s ease-in-out infinite;
+      }
+
+      @keyframes progress {
+        0% {
+          transform: translateX(-100%);
+        }
+        50% {
+          transform: translateX(200%);
+        }
+        100% {
+          transform: translateX(-100%);
+        }
+      }
+
+      @media (max-width: 968px) {
+        .recorder-grid {
+          grid-template-columns: 1fr;
+          gap: 36px;
+        }
+        .recorder-shell {
+          margin-left: 0;
+          margin-right: 0;
+          max-width: 520px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVIGATION -->
+    <nav id="navbar">
+      <div class="container nav-content">
+        <a href="#" class="logo" aria-label="MarvelUs Home">
+          <div class="logo-mark">M</div>
+          <span>MarvelUs</span>
+        </a>
+        <div class="nav-links">
+          <a href="#flow" class="nav-link">The Experience</a>
+          <a href="#vault" class="nav-link">Security</a>
+          <a href="#preview" class="nav-link">Results</a>
+          <a href="#start" class="nav-cta">Get Early Access</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="section hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="eyebrow reveal">The Invisible Assistant</span>
+          <h1 class="headline-hero reveal" style="transition-delay: 0.1s">
+            Never miss a word<br />
+            that <span class="italic-accent">matters</span>
+          </h1>
+          <p class="subheadline reveal" style="transition-delay: 0.2s">
+            MarvelUs uses local AI to capture every nuance of your beauty consultations—then
+            crafts follow-ups your clients will love. All processing happens on your device.
+          </p>
+
+          <div class="cta-container reveal" style="transition-delay: 0.3s">
+            <span class="float-wrap">
+              <button class="neural-button" data-magnetic="true" onclick="handlePrimaryCTA()">
+                <span class="button-shimmer"></span>
+                <span class="button-text">
+                  Begin Consultation
+                  <svg
+                    class="button-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </button>
+            </span>
+            <div class="trust-badge">On-Device AI • Zero Cloud Exposure</div>
           </div>
-          <div class="scroll-indicator" aria-hidden="true"></div>
         </div>
 
-        <div class="recorder-wrap" aria-label="Recorder">
-          <div class="recorder-shell" id="recorder">
-            <div class="recorder-card">
-              <div class="recorder-top">
-                <p class="mini">Your consultation space</p>
-                <p class="promise">Record now. We’ll draft the recap you wish you had.</p>
+        <div class="hero-visual reveal" style="transition-delay: 0.4s">
+          <div class="neural-orb"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE FLOW SECTION -->
+    <section class="section flow-section" id="flow">
+      <div class="container">
+        <div style="max-width: 600px; margin-bottom: 40px">
+          <span class="eyebrow reveal">The Experience</span>
+          <h2 class="headline-section reveal">Stay present.<br />We'll handle the rest.</h2>
+        </div>
+
+        <div class="flow-grid">
+          <div class="flow-card reveal" style="transition-delay: 0.1s">
+            <span class="flow-number">01</span>
+            <h3 class="flow-title">Tap & Focus</h3>
+            <p class="flow-desc">
+              One tap to begin. No complex setup, no visible interface to manage. Just place
+              your device nearby and give your client your full attention.
+            </p>
+          </div>
+
+          <div class="flow-card reveal" style="transition-delay: 0.2s">
+            <span class="flow-number">02</span>
+            <h3 class="flow-title">Neural Capture</h3>
+            <p class="flow-desc">
+              Local AI processes speech in real-time, distinguishing voices and understanding
+              aesthetic terminology without sending audio to any server.
+            </p>
+          </div>
+
+          <div class="flow-card reveal" style="transition-delay: 0.3s">
+            <span class="flow-number">03</span>
+            <h3 class="flow-title">Instant Draft</h3>
+            <p class="flow-desc">
+              Within seconds of ending, receive a beautifully formatted recap and suggested
+              follow-up email, ready to review and send.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- THE VAULT SECTION -->
+    <section class="section vault-section" id="vault">
+      <div class="container vault-content">
+        <div class="vault-icon reveal" aria-hidden="true">🔒</div>
+        <span class="eyebrow reveal" style="transition-delay: 0.1s">The Vault</span>
+        <h2 class="headline-section reveal" style="transition-delay: 0.2s">
+          What happens in the<br />
+          room <span class="text-gradient">stays in the room</span>
+        </h2>
+        <p class="body-large reveal" style="transition-delay: 0.3s; margin: 0 auto">
+          Unlike transcription services that process audio in the cloud, MarvelUs runs
+          entirely on your device. Your clients' intimate concerns, medical history, and
+          personal photos never touch a server. Not ours. Not anyone's.
+        </p>
+
+        <div class="security-badges reveal" style="transition-delay: 0.4s">
+          <div class="security-badge"><span>End-to-End Encryption</span></div>
+          <div class="security-badge"><span>HIPAA Compliant Architecture</span></div>
+          <div class="security-badge"><span>No Data Retention</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREVIEW SECTION -->
+    <section class="section preview-section" id="preview">
+      <div class="container">
+        <div style="text-align: center; max-width: 600px; margin: 0 auto">
+          <span class="eyebrow reveal">The Output</span>
+          <h2 class="headline-section reveal">Documentation<br />that feels human</h2>
+        </div>
+
+        <div class="preview-container reveal" style="transition-delay: 0.2s">
+          <div class="preview-header">
+            <span class="preview-label">Consultation Recap • Generated 2m ago</span>
+            <div class="preview-status">
+              <span class="status-dot"></span>
+              <span>AI Confirmed</span>
+            </div>
+          </div>
+
+          <div class="transcript-preview">
+            <div class="transcript-line">
+              <span class="timestamp">0:12</span>
+              <span class="speaker">Client:</span>
+              <span class="text">"I've been considering the treatment for my marionette lines..."</span>
+            </div>
+            <div class="transcript-line">
+              <span class="timestamp">0:45</span>
+              <span class="speaker">You:</span>
+              <span class="text">"We can address that with a conservative approach..."</span>
+            </div>
+            <div class="transcript-line">
+              <span class="timestamp">2:30</span>
+              <span class="speaker">Client:</span>
+              <span class="text">"Will there be downtime before the event?"</span>
+            </div>
+            <div class="transcript-line">
+              <span class="timestamp">2:45</span>
+              <span class="speaker">You:</span>
+              <span class="text">"Minimal swelling for 48 hours. You'll be radiant by Friday."</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.05)">
+            <p style="font-size: var(--text-sm); color: var(--text-tertiary); font-style: italic">
+              "Based on this consultation, I recommend scheduling the filler appointment for Wednesday
+              to allow optimal healing time before your gala."
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="section final-cta" id="start">
+      <div class="container final-cta-content">
+        <h2 class="headline-hero reveal" style="font-size: clamp(36px, 5vw, 56px)">
+          Ready to be fully<br />
+          <span class="italic-accent">present?</span>
+        </h2>
+        <p class="subheadline reveal" style="margin: 0 auto; transition-delay: 0.1s">
+          Join beauty clinics transforming their consultation experience with invisible AI.
+        </p>
+
+        <div class="reveal" style="transition-delay: 0.2s">
+          <span class="float-wrap">
+            <button class="neural-button" data-magnetic="true" onclick="handleFinalCTA()">
+              <span class="button-shimmer"></span>
+              <span class="button-text">
+                Request Early Access
+                <svg
+                  class="button-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </span>
+            </button>
+          </span>
+          <p style="margin-top: 24px; font-size: var(--text-sm); color: var(--text-tertiary)">
+            Currently accepting select clinics for our pilot program
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECORDER FORM (APP) -->
+    <section class="section recorder-section" id="recorder">
+      <div class="container recorder-grid">
+        <div>
+          <div class="recorder-kicker reveal">Begin</div>
+          <h2 class="recorder-title reveal" style="transition-delay: 0.1s">
+            Your consultation space.
+            <br />
+            <span class="text-gradient">Quietly powered</span>.
+          </h2>
+          <p class="recorder-copy reveal" style="transition-delay: 0.2s">
+            Enter the client and provider name, then tap record. When you stop, MarvelUs uploads,
+            processes, and returns your transcript plus a drafted follow-up.
+          </p>
+        </div>
+
+        <div class="recorder-shell reveal" style="transition-delay: 0.25s">
+          <div class="recorder-card" aria-label="Recorder">
+            <!-- Ready -->
+            <div id="screen-ready">
+              <div class="soft-panel" style="margin-bottom: 14px">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 10px;
+                  "
+                >
+                  <div>
+                    <div
+                      style="
+                        font-size: 12px;
+                        letter-spacing: 0.12em;
+                        text-transform: uppercase;
+                        color: var(--text-tertiary);
+                        margin-bottom: 6px;
+                      "
+                    >
+                      You'll receive
+                    </div>
+                    <div style="font-size: 14px; color: rgba(255, 255, 255, 0.82); font-weight: 500">
+                      Transcript + a drafted follow-up email
+                    </div>
+                  </div>
+                </div>
               </div>
- 
- <!-- Ready -->
- <div id="screen-ready">
- <div class="soft-panel" style="margin-bottom: 12px;">
-   <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-     <div>
-       <div style="font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">You’ll receive</div>
-       <div style="font-size:14px; color:rgba(10,25,47,0.82); font-weight:500;">Transcript + a drafted follow‑up email</div>
-     </div>
-   </div>
- </div>
 
- <input type="text" id="clientName" class="field" placeholder="Patient / client name">
- <input type="text" id="therapistName" class="field" placeholder="Clinician / therapist name (optional)" style="margin-bottom:14px;">
+              <div style="display: grid; gap: 10px; margin-bottom: 14px">
+                <input type="text" id="clientName" class="field" placeholder="Client name" />
+                <input
+                  type="text"
+                  id="therapistName"
+                  class="field"
+                  placeholder="Clinician / therapist name (optional)"
+                />
+              </div>
 
- <div style="text-align:center;">
-   <button onclick="startRecording()" type="button" aria-label="Start recording" style="width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; animation: pulse 2s infinite; box-shadow: 0 18px 44px rgba(255,107,107,0.20);">
-     🎙️
-   </button>
-   <p style="color: var(--muted); margin-top: 12px; font-weight:300;">Tap to record</p>
- </div>
- </div>
+              <div style="text-align: center">
+                <span class="float-wrap">
+                  <button
+                    class="neural-button"
+                    data-magnetic="true"
+                    onclick="startRecording()"
+                    type="button"
+                    aria-label="Start recording"
+                    style="width: 6.4rem; height: 6.4rem; padding: 0; border-radius: 9999px"
+                  >
+                    <span class="button-shimmer"></span>
+                    <span class="button-text" style="gap: 0; font-size: 28px">🎙️</span>
+                  </button>
+                </span>
+                <p style="color: var(--text-secondary); margin-top: 12px; font-weight: 300">
+                  Tap to record
+                </p>
+              </div>
+            </div>
 
- <!-- Recording -->
- <div id="screen-recording" class="hidden" style="text-align: center; padding: 26px 0 8px;">
- <div style="width: 6rem; height: 6rem; border-radius: 50%; background: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto; animation: pulse 1s infinite; box-shadow: 0 18px 44px rgba(239,68,68,0.18);">🔴</div>
- <p style="color: var(--muted); margin-top: 14px; margin-bottom: 6px; font-weight:300;">Recording…</p>
- <p id="timer" style="font-size: 3rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; letter-spacing:-0.02em;">00:00</p>
- <button class="btn btn-primary" onclick="stopRecording()" type="button" style="margin-top: 10px; background: #ef4444;">Stop</button>
- </div>
+            <!-- Recording -->
+            <div id="screen-recording" class="hidden" style="text-align: center; padding: 26px 0 10px">
+              <div
+                style="
+                  width: 6.4rem;
+                  height: 6.4rem;
+                  border-radius: 9999px;
+                  background: rgba(255, 107, 107, 0.22);
+                  border: 1px solid rgba(255, 107, 107, 0.35);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 2rem;
+                  margin: 0 auto;
+                  animation: pulse 1s infinite;
+                  box-shadow: 0 18px 44px rgba(255, 107, 107, 0.18);
+                "
+              >
+                🔴
+              </div>
+              <p style="color: var(--text-secondary); margin-top: 14px; margin-bottom: 6px; font-weight: 300">
+                Recording…
+              </p>
+              <p
+                id="timer"
+                style="
+                  font-size: 3rem;
+                  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                    'Liberation Mono', 'Courier New', monospace;
+                  letter-spacing: -0.02em;
+                "
+              >
+                00:00
+              </p>
+              <button
+                class="icon-btn danger"
+                onclick="stopRecording()"
+                type="button"
+                style="margin-top: 12px; width: 100%"
+              >
+                Stop
+              </button>
+            </div>
 
- <!-- Uploading -->
- <div id="screen-uploading" class="hidden" style="text-align: center; padding: 2rem 0;">
- <div class="spinner" style="margin: 0 auto 1rem;"></div>
- <p style="font-size: 1.1rem; font-weight:500;">Uploading…</p>
- <div style="margin-top: 1rem; height: 4px; background: rgba(10,25,47,0.10); border-radius: 2px; overflow: hidden;">
- <div class="progress-bar"></div>
- </div>
- </div>
+            <!-- Uploading -->
+            <div id="screen-uploading" class="hidden" style="text-align: center; padding: 34px 0 18px">
+              <div class="spinner" style="margin: 0 auto 16px"></div>
+              <p style="font-size: 1.05rem; font-weight: 500">Uploading…</p>
+              <div class="progress-track"><div class="progress-bar"></div></div>
+            </div>
 
- <!-- Processing -->
- <div id="screen-processing" class="hidden" style="text-align: center; padding: 1.5rem 0;">
- <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: rgba(255,107,107,0.10); border: 1px solid rgba(255,107,107,0.20); border-radius: 9999px; margin-bottom: 1rem;">
- <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1s infinite;"></span>
- <span style="font-size: 0.875rem; color: rgba(10,25,47,0.82); font-weight:500;">Preparing your consultation space</span>
- </div>
- 
- <div style="text-align: left;">
- <div style="padding: 0.75rem; background: rgba(10,25,47,0.03); border: 1px solid rgba(10,25,47,0.06); border-radius: 0.75rem; margin-bottom: 0.5rem;">🎯 Transcribing audio…</div>
- <div style="padding: 0.75rem; background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.05); border-radius: 0.75rem; margin-bottom: 0.5rem; opacity: 0.62;">📝 Extracting notes…</div>
- <div style="padding: 0.75rem; background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.05); border-radius: 0.75rem; opacity: 0.62;">✉️ Drafting follow‑up…</div>
- </div>
- 
- <p style="color: var(--muted); font-size: 0.75rem; margin-top: 1rem; font-weight:300;">Usually 10–30 seconds</p>
- </div>
+            <!-- Processing -->
+            <div id="screen-processing" class="hidden" style="text-align: center; padding: 22px 0">
+              <div
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 10px;
+                  padding: 8px 14px;
+                  background: rgba(0, 240, 255, 0.1);
+                  border: 1px solid rgba(0, 240, 255, 0.22);
+                  border-radius: 9999px;
+                  margin-bottom: 14px;
+                "
+              >
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-cyan); animation: pulse 1s infinite"></span>
+                <span style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.82); font-weight: 500">
+                  Processing
+                </span>
+              </div>
 
- <!-- Results -->
- <div id="screen-results" class="hidden">
- <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(10,25,47,0.10);">
- <div style="width: 2.5rem; height: 2.5rem; background: rgba(16,185,129,0.14); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: #059669; border: 1px solid rgba(5,150,105,0.20);">✓</div>
- <div>
- <p style="font-weight: 600; letter-spacing:-0.01em;">Ready.</p>
- <p id="resultClient" style="font-size: 0.75rem; color: var(--muted);"></p>
- </div>
- </div>
- 
- <div style="margin-bottom: 1rem;">
- <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem;">
-  <p style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing:0.12em; margin: 0;">drafted email</p>
-  <button type="button" onclick="copyResult('resultEmail', this)" class="icon-btn">Copy</button>
- </div>
- <div style="background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.08); border-radius: 0.9rem; padding: 0.75rem; max-height: 10rem; overflow-y: auto;">
- <p id="resultEmail" style="font-size: 0.875rem; color: rgba(10,25,47,0.84); white-space: pre-wrap; font-weight:300;"></p>
- </div>
- </div>
- 
- <div style="margin-bottom: 1rem;">
- <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem;">
-  <p style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing:0.12em; margin: 0;">transcript</p>
-  <button type="button" onclick="copyResult('resultTranscript', this)" class="icon-btn">Copy</button>
- </div>
- <div style="background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.08); border-radius: 0.9rem; padding: 0.75rem; max-height: 8rem; overflow-y: auto;">
- <p id="resultTranscript" style="font-size: 0.875rem; color: rgba(10,25,47,0.84); font-weight:300;"></p>
- </div>
- </div>
- 
- <button class="btn btn-primary" onclick="location.reload()" type="button" style="width:100%;">New recording</button>
- </div>
+              <div style="text-align: left; display: grid; gap: 10px">
+                <div class="soft-panel">🎯 Transcribing audio…</div>
+                <div class="soft-panel" style="opacity: 0.7">📝 Extracting notes…</div>
+                <div class="soft-panel" style="opacity: 0.7">✉️ Drafting follow‑up…</div>
+              </div>
 
- <!-- Error -->
- <div id="screen-error" class="hidden" style="text-align: center; padding: 2rem 0;">
- <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚠️</div>
- <p style="color: #ef4444; font-weight: 600; margin-bottom: 0.5rem;">Something went wrong</p>
- <p id="errorText" style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1rem; font-weight:300;"></p>
- <button class="btn" onclick="location.reload()" type="button">Reload</button>
- </div>
+              <p style="color: var(--text-tertiary); font-size: 0.8rem; margin-top: 14px; font-weight: 300">
+                Usually 10–30 seconds
+              </p>
+            </div>
 
+            <!-- Results -->
+            <div id="screen-results" class="hidden">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 12px;
+                  margin-bottom: 14px;
+                  padding-bottom: 14px;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                "
+              >
+                <div
+                  style="
+                    width: 2.6rem;
+                    height: 2.6rem;
+                    background: rgba(0, 255, 136, 0.12);
+                    border-radius: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #00ff88;
+                    border: 1px solid rgba(0, 255, 136, 0.18);
+                  "
+                >
+                  ✓
+                </div>
+                <div>
+                  <p style="font-weight: 600; letter-spacing: -0.01em">Ready.</p>
+                  <p id="resultClient" style="font-size: 0.8rem; color: var(--text-tertiary)"></p>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 16px">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <p
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-tertiary);
+                      text-transform: uppercase;
+                      letter-spacing: 0.12em;
+                      margin: 0;
+                    "
+                  >
+                    drafted email
+                  </p>
+                  <button type="button" onclick="copyResult('resultEmail', this)" class="icon-btn">
+                    Copy
+                  </button>
+                </div>
+                <div
+                  style="
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 16px;
+                    padding: 12px;
+                    max-height: 12rem;
+                    overflow-y: auto;
+                  "
+                >
+                  <p
+                    id="resultEmail"
+                    style="
+                      font-size: 0.95rem;
+                      color: rgba(255, 255, 255, 0.86);
+                      white-space: pre-wrap;
+                      font-weight: 300;
+                    "
+                  ></p>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 16px">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <p
+                    style="
+                      font-size: 0.75rem;
+                      color: var(--text-tertiary);
+                      text-transform: uppercase;
+                      letter-spacing: 0.12em;
+                      margin: 0;
+                    "
+                  >
+                    transcript
+                  </p>
+                  <button type="button" onclick="copyResult('resultTranscript', this)" class="icon-btn">
+                    Copy
+                  </button>
+                </div>
+                <div
+                  style="
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 16px;
+                    padding: 12px;
+                    max-height: 10rem;
+                    overflow-y: auto;
+                  "
+                >
+                  <p
+                    id="resultTranscript"
+                    style="font-size: 0.95rem; color: rgba(255, 255, 255, 0.86); font-weight: 300"
+                  ></p>
+                </div>
+              </div>
+
+              <button class="icon-btn" onclick="location.reload()" type="button" style="width: 100%">
+                New recording
+              </button>
+            </div>
+
+            <!-- Error -->
+            <div id="screen-error" class="hidden" style="text-align: center; padding: 26px 0">
+              <div style="font-size: 2.5rem; margin-bottom: 10px">⚠️</div>
+              <p style="color: rgba(255, 107, 107, 0.95); font-weight: 600; margin-bottom: 8px">
+                Something went wrong
+              </p>
+              <p id="errorText" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 14px; font-weight: 300"></p>
+              <button class="icon-btn" onclick="location.reload()" type="button">Reload</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="moment-section" id="how" aria-label="How it works">
-      <div class="moment-inner">
-        <div class="watermark" data-no="01">
-          <p class="moment-kicker">During the visit</p>
-          <h2 class="moment-title">Stay present.</h2>
-          <p class="moment-copy">Hit record, then focus on the conversation. No frantic note‑taking. No “I’ll remember it later.”</p>
-        </div>
-        <div class="moment-card" aria-hidden="true">
-          <div class="poetry">“Let’s take this one step at a time.
-
-What matters most today is clarity.”</div>
-        </div>
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <p>&copy; <span id="year"></span> MarvelUs Technologies. Privacy is our foundation.</p>
       </div>
-    </section>
+    </footer>
 
-    <section class="moment-section" aria-label="Clarity after">
-      <div class="moment-inner">
-        <div class="watermark" data-no="02">
-          <p class="moment-kicker">The clarity after</p>
-          <h2 class="moment-title">A recap you can actually use.</h2>
-          <p class="moment-copy">Clean transcript. Key points. Next steps. Written like a human—so it’s easy to act on.</p>
-        </div>
-        <div class="moment-card" aria-hidden="true">
-          <div class="poetry"><strong>Summary</strong>
-- Main concern: symptoms increased this week
-- Plan: adjust routine + follow‑up in 2 weeks
-- Next step: start with the smallest change you can keep</div>
-        </div>
-      </div>
-    </section>
+    <script>
+      // -----------------------------
+      // Backend configuration (required for current app flow)
+      // -----------------------------
+      const API_URL = "https://partible-nonactionable-tyrell.ngrok-free.dev";
+      const API_HEADERS = {
+        Accept: "application/json",
+        "ngrok-skip-browser-warning": "69420",
+      };
 
-    <section class="moment-section" aria-label="Share with family">
-      <div class="moment-inner">
-        <div class="watermark" data-no="03">
-          <p class="moment-kicker">Sharing, made simple</p>
-          <h2 class="moment-title">Send the follow‑up in minutes.</h2>
-          <p class="moment-copy">A drafted email recap you can copy, edit, and send—so everyone is aligned.</p>
-        </div>
-        <div class="moment-card" aria-hidden="true">
-          <div class="poetry">Subject: Thank you for our consultation
+      // Navigation scroll effect
+      const navbar = document.getElementById("navbar");
+      window.addEventListener(
+        "scroll",
+        () => {
+          const currentScroll = window.pageYOffset;
+          if (currentScroll > 100) navbar.classList.add("scrolled");
+          else navbar.classList.remove("scrolled");
+        },
+        { passive: true }
+      );
 
-Hi there,
+      // Intersection Observer for reveal animations
+      const observer = new IntersectionObserver(
+        (entries, obs) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add("active");
+            obs.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.1 }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
-Here’s a concise recap and next steps…</div>
-        </div>
-      </div>
-    </section>
+      // Magnetic button effect (works with float wrapper)
+      const magneticButtons = document.querySelectorAll(
+        '.neural-button[data-magnetic="true"]'
+      );
+      magneticButtons.forEach((button) => {
+        button.addEventListener("mousemove", (e) => {
+          const rect = button.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          const moveX = x * 0.08;
+          const moveY = y * 0.08;
+          button.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.05)`;
+        });
+        button.addEventListener("mouseleave", () => {
+          button.style.transform = "";
+        });
+      });
 
-    <section class="trust" id="privacy" aria-label="Privacy">
-      <div class="trust-inner">
-        <div style="max-width:62ch; margin-bottom:14px;">
-          <p class="moment-kicker">Privacy</p>
-          <h2 class="moment-title" style="margin-bottom:8px;">Respect is a feature.</h2>
-          <p class="moment-copy">This demo runs through a backend endpoint (see `API_URL` in the file). If you want true on‑device processing, we can swap in local transcription and keep everything offline.</p>
-        </div>
-        <div class="trust-row" role="list">
-          <div class="trust-item" role="listitem">HIPAA readiness <span>(depends on deployment)</span></div>
-          <div class="trust-item" role="listitem">Encryption <span>(in transit + at rest)</span></div>
-          <div class="trust-item" role="listitem">Data minimization <span>(store only what you need)</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="moment-section" id="providers" aria-label="For providers">
-      <div class="moment-inner">
-        <div class="watermark" data-no="P">
-          <p class="moment-kicker">For providers</p>
-          <h2 class="moment-title">A calmer workflow.</h2>
-          <p class="moment-copy">Use it as a lightweight capture tool: record, receive a structured recap, and keep your documentation consistent.</p>
-        </div>
-        <div class="moment-card" aria-hidden="true">
-          <div class="poetry"><strong>Tip</strong>
-Pair this with your clinic’s template language so the drafted email matches your voice.</div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer" role="contentinfo">
-    <div class="footer-inner">
-      <div><span class="brand-mark">MarvelUs</span> <span style="color:rgba(10,25,47,0.45);">©</span> <span id="year"></span></div>
-      <div style="display:flex; gap:14px; align-items:center;">
-        <a href="#privacy">Privacy</a>
-        <a href="#top">Back to top</a>
-      </div>
-    </div>
-  </footer>
-</div>
-
-<script>
-const API_URL = 'https://partible-nonactionable-tyrell.ngrok-free.dev';
-/** Helps ngrok free tier + makes intent explicit to caches / intermediaries */
-const API_HEADERS = { 'Accept': 'application/json', 'ngrok-skip-browser-warning': '69420' };
-
-let recorder = null, chunks = [], timer = null, seconds = 0;
-
-function scrollToRecorder() {
-  const el = document.getElementById('recorder');
-  if (!el) return;
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  setTimeout(() => document.getElementById('clientName')?.focus(), 400);
-}
-
-async function copyResult(elementId, buttonEl) {
-  const el = document.getElementById(elementId);
-  const text = (el?.textContent || '').trimEnd();
-  if (!text) return;
-
-  const prev = buttonEl?.textContent;
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-    } else {
-      // Fallback for older browsers without Clipboard API.
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed';
-      ta.style.left = '-9999px';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-    }
-    if (buttonEl) buttonEl.textContent = 'Copied';
-  } catch (e) {
-    if (buttonEl) buttonEl.textContent = 'Copy failed';
-  } finally {
-    if (buttonEl) setTimeout(() => (buttonEl.textContent = prev || 'Copy'), 1200);
-  }
-}
-
-function show(id) {
- document.querySelectorAll('[id^="screen-"]').forEach(el => el.classList.add('hidden'));
- document.getElementById('screen-' + id).classList.remove('hidden');
-}
-
-// Subtle waveform animation for hero background (no external deps).
-(function initWave(){
-  const canvas = document.getElementById('wave');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-  let w = 0, h = 0, t = 0;
-
-  function resize(){
-    const rect = canvas.getBoundingClientRect();
-    w = Math.max(1, Math.floor(rect.width));
-    h = Math.max(1, Math.floor(rect.height));
-    canvas.width = Math.floor(w * dpr);
-    canvas.height = Math.floor(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-
-  function draw(){
-    t += 0.012;
-    ctx.clearRect(0, 0, w, h);
-
-    const mid = Math.floor(h * 0.52);
-    const amp = Math.max(12, Math.floor(h * 0.06));
-    const lines = 3;
-
-    for (let li = 0; li < lines; li++){
-      const phase = t + li * 0.7;
-      const alpha = 0.16 - li * 0.035;
-      ctx.beginPath();
-      for (let x = 0; x <= w; x += 4){
-        const nx = x / w;
-        const envelope = Math.sin(Math.PI * nx);
-        const y =
-          mid
-          + Math.sin(nx * 10 + phase) * amp * envelope
-          + Math.sin(nx * 22 + phase * 1.5) * (amp * 0.38) * envelope;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      function handlePrimaryCTA() {
+        scrollToRecorder();
       }
-      ctx.lineWidth = 1.2;
-      ctx.strokeStyle = `rgba(255, 107, 107, ${Math.max(0.04, alpha)})`;
-      ctx.stroke();
-    }
 
-    requestAnimationFrame(draw);
-  }
+      function handleFinalCTA() {
+        alert("Thank you for your interest. This would connect to your access request form.");
+      }
 
-  resize();
-  window.addEventListener('resize', resize, { passive: true });
-  requestAnimationFrame(draw);
-})();
+      document.getElementById("year").textContent = String(new Date().getFullYear());
 
-// Footer year
-document.getElementById('year').textContent = String(new Date().getFullYear());
+      function scrollToRecorder() {
+        const el = document.getElementById("recorder");
+        if (!el) return;
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        setTimeout(() => document.getElementById("clientName")?.focus(), 450);
+      }
 
-/** Always read body as text first so HTML error pages surface instead of silent JSON parse failures */
-async function fetchJson(url, options = {}) {
- const res = await fetch(url, {
-  ...options,
-  cache: 'no-store',
-  headers: { ...API_HEADERS, ...options.headers },
- });
- const text = await res.text();
- let data;
- try {
-  data = JSON.parse(text);
- } catch {
-  throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 220)}`);
- }
- return { res, data, text };
-}
+      async function copyResult(elementId, buttonEl) {
+        const el = document.getElementById(elementId);
+        const text = (el?.textContent || "").trimEnd();
+        if (!text) return;
 
-function splitSentences(text) {
-  return String(text || '')
-    .replace(/\s+/g, ' ')
-    .split(/(?<=[.!?])\s+(?=[A-Z0-9"“])/g)
-    .map(s => s.trim())
-    .filter(Boolean);
-}
+        const prev = buttonEl?.textContent;
+        try {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.setAttribute("readonly", "");
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+          }
+          if (buttonEl) buttonEl.textContent = "Copied";
+        } catch (e) {
+          if (buttonEl) buttonEl.textContent = "Copy failed";
+        } finally {
+          if (buttonEl) setTimeout(() => (buttonEl.textContent = prev || "Copy"), 1200);
+        }
+      }
 
-function topKByScore(items, k) {
-  return items
-    .filter(Boolean)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, k)
-    .map(x => x.text);
-}
+      function show(id) {
+        document.querySelectorAll('[id^="screen-"]').forEach((el) => el.classList.add("hidden"));
+        document.getElementById("screen-" + id)?.classList.remove("hidden");
+      }
 
-function makeConciseBullets(lines, max = 6) {
-  const out = [];
-  const seen = new Set();
-  for (const line of lines) {
-    const clean = String(line || '').replace(/\s+/g, ' ').trim();
-    const key = clean.toLowerCase();
-    if (!clean || clean.length < 12) continue;
-    // Drop pure pleasantries, but keep long lines that contain real content.
-    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/i.test(clean) && clean.length < 40) continue;
-    if (/\b(thanks for coming|nice to meet you|how are you)\b/i.test(clean) && clean.length < 60) continue;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(clean.length > 180 ? clean.slice(0, 177) + '…' : clean);
-    if (out.length >= max) break;
-  }
-  return out;
-}
+      /** Always read body as text first so HTML error pages surface */
+      async function fetchJson(url, options = {}) {
+        const res = await fetch(url, {
+          ...options,
+          cache: "no-store",
+          headers: { ...API_HEADERS, ...options.headers },
+        });
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 220)}`);
+        }
+        return { res, data, text };
+      }
 
-function normalizeClientName(name) {
-  const n = String(name || '').trim();
-  if (!n) return 'there';
-  // Keep it boring/safe for email greetings.
-  const cleaned = n.replace(/[^\p{L}\p{N}\s.'-]/gu, '').replace(/\s+/g, ' ').trim();
-  return cleaned || 'there';
-}
+      function splitSentences(text) {
+        return String(text || "")
+          .replace(/\s+/g, " ")
+          .split(/(?<=[.!?])\s+(?=[A-Z0-9"“])/g)
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
 
-function normalizeTherapistName(name) {
-  const n = String(name || '').trim();
-  if (!n) return '';
-  // Keep it boring/safe for email signoffs.
-  const cleaned = n.replace(/[^\p{L}\p{N}\s.'-]/gu, '').replace(/\s+/g, ' ').trim();
-  return cleaned || '';
-}
+      function topKByScore(items, k) {
+        return items
+          .filter(Boolean)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, k)
+          .map((x) => x.text);
+      }
 
-function localExtractSessionNotes(transcript) {
-  const sentences = splitSentences(transcript);
-  const filtered = sentences.filter(s => {
-    const t = s.toLowerCase();
-    if (t.length < 10) return false;
-    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/.test(t) && t.length < 40) return false;
-    if (/(thanks for coming|nice to meet you|how are you)\b/.test(t) && t.length < 60) return false;
-    return true;
-  });
+      function makeConciseBullets(lines, max = 6) {
+        const out = [];
+        const seen = new Set();
+        for (const line of lines) {
+          const clean = String(line || "").replace(/\s+/g, " ").trim();
+          const key = clean.toLowerCase();
+          if (!clean || clean.length < 12) continue;
+          if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/i.test(clean) && clean.length < 40)
+            continue;
+          if (/\b(thanks for coming|nice to meet you|how are you)\b/i.test(clean) && clean.length < 60)
+            continue;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          out.push(clean.length > 180 ? clean.slice(0, 177) + "…" : clean);
+          if (out.length >= max) break;
+        }
+        return out;
+      }
 
-  const scored = filtered.map(text => {
-    const t = text.toLowerCase();
-    const kw = (re) => (re.test(t) ? 1 : 0);
-    const score =
-      2 * kw(/\b(concern|worried|anxious|fear|stress|overwhelm|panic|struggle|hard|difficult)\b/) +
-      2 * kw(/\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/) +
-      2 * kw(/\b(should|could|let's|we can|i want you to|i'd like you to|please)\b/) +
-      2 * kw(/\b(goal|objective|priority|focus)\b/) +
-      1 * kw(/\b(feel|felt|feeling)\b/) +
-      1 * kw(/\b(because|so that|in order to)\b/) +
-      Math.min(2, Math.max(0, (text.length - 60) / 120));
-    return { text, score };
-  });
+      function normalizeClientName(name) {
+        const n = String(name || "").trim();
+        if (!n) return "there";
+        const cleaned = n.replace(/[^\p{L}\p{N}\s.'-]/gu, "").replace(/\s+/g, " ").trim();
+        return cleaned || "there";
+      }
 
-  const concerns = topKByScore(
-    scored
-      .map(x => ({ ...x, score: x.score + (/\b(concern|worried|anxious|fear|stress|panic|struggle|pain|symptom)\b/i.test(x.text) ? 2 : 0) }))
-      .filter(x => /\b(concern|worried|anxious|fear|stress|panic|struggle|hard|difficult|pain|symptom)\b/i.test(x.text)),
-    3
-  );
+      function normalizeTherapistName(name) {
+        const n = String(name || "").trim();
+        if (!n) return "";
+        const cleaned = n.replace(/[^\p{L}\p{N}\s.'-]/gu, "").replace(/\s+/g, " ").trim();
+        return cleaned || "";
+      }
 
-  const recommendations = topKByScore(
-    scored
-      .map(x => ({
-        ...x,
-        score:
-          x.score +
-          (/\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/i.test(x.text) ? 2 : 0) +
-          (/\b(should|could|let's|we can|i want you to|i'd like you to|please)\b/i.test(x.text) ? 1 : 0)
-      }))
-      .filter(x => /\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up|should|could|let's|we can)\b/i.test(x.text)),
-    3
-  );
+      function localExtractSessionNotes(transcript) {
+        const sentences = splitSentences(transcript);
+        const filtered = sentences.filter((s) => {
+          const t = s.toLowerCase();
+          if (t.length < 10) return false;
+          if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/.test(t) && t.length < 40) return false;
+          if (/(thanks for coming|nice to meet you|how are you)\b/.test(t) && t.length < 60) return false;
+          return true;
+        });
 
-  const discussed = topKByScore(scored, 4);
+        const scored = filtered.map((text) => {
+          const t = text.toLowerCase();
+          const kw = (re) => (re.test(t) ? 1 : 0);
+          const score =
+            2 * kw(/\b(concern|worried|anxious|fear|stress|overwhelm|panic|struggle|hard|difficult)\b/) +
+            2 * kw(/\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/) +
+            2 * kw(/\b(should|could|let's|we can|i want you to|i'd like you to|please)\b/) +
+            2 * kw(/\b(goal|objective|priority|focus)\b/) +
+            1 * kw(/\b(feel|felt|feeling)\b/) +
+            1 * kw(/\b(because|so that|in order to)\b/) +
+            Math.min(2, Math.max(0, (text.length - 60) / 120));
+          return { text, score };
+        });
 
-  const bullets = makeConciseBullets([
-    ...discussed,
-    ...concerns,
-    ...recommendations,
-  ], 7);
+        const concerns = topKByScore(
+          scored
+            .map((x) => ({
+              ...x,
+              score: x.score + (/\b(concern|worried|anxious|fear|stress|panic|struggle|pain|symptom)\b/i.test(x.text) ? 2 : 0),
+            }))
+            .filter((x) => /\b(concern|worried|anxious|fear|stress|panic|struggle|hard|difficult|pain|symptom)\b/i.test(x.text)),
+          3
+        );
 
-  return { discussed, concerns, recommendations, bullets };
-}
+        const recommendations = topKByScore(
+          scored
+            .map((x) => ({
+              ...x,
+              score:
+                x.score +
+                (/\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/i.test(x.text) ? 2 : 0) +
+                (/\b(should|could|let's|we can|i want you to|i'd like you to|please)\b/i.test(x.text) ? 1 : 0),
+            }))
+            .filter((x) => /\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up|should|could|let's|we can)\b/i.test(x.text)),
+          3
+        );
 
-function parseEmailTemplate(email) {
-  const text = String(email || '').trim();
-  const subjectMatch = text.match(/^Subject:\s*(.+)\s*$/mi);
-  const subject = subjectMatch?.[1]?.trim() || '';
+        const discussed = topKByScore(scored, 4);
 
-  // Capture a conventional signoff if present ("Best,", "Sincerely,", etc + following lines).
-  const signoffMatch = text.match(/\n(?:best regards|best|sincerely|kind regards|thanks|thank you),\s*\n[\s\S]*$/i);
-  const signoff = signoffMatch ? signoffMatch[0].trim() : '';
-  return { subject, signoff };
-}
+        const bullets = makeConciseBullets([...discussed, ...concerns, ...recommendations], 7);
+        return { discussed, concerns, recommendations, bullets };
+      }
 
-function composeFinalEmail({ clientName, therapistName, notes, templateEmail }) {
-  const { subject: templateSubject, signoff: templateSignoff } = parseEmailTemplate(templateEmail);
-  const name = normalizeClientName(clientName);
-  const therapist = normalizeTherapistName(therapistName);
+      function parseEmailTemplate(email) {
+        const text = String(email || "").trim();
+        const subjectMatch = text.match(/^Subject:\s*(.+)\s*$/mi);
+        const subject = subjectMatch?.[1]?.trim() || "";
+        const signoffMatch = text.match(/\n(?:best regards|best|sincerely|kind regards|thanks|thank you),\s*\n[\s\S]*$/i);
+        const signoff = signoffMatch ? signoffMatch[0].trim() : "";
+        return { subject, signoff };
+      }
 
-  const subject = templateSubject || `Thank you for our consultation — ${new Date().toLocaleDateString()}`;
+      function composeFinalEmail({ clientName, therapistName, notes, templateEmail }) {
+        const { subject: templateSubject, signoff: templateSignoff } = parseEmailTemplate(templateEmail);
+        const name = normalizeClientName(clientName);
+        const therapist = normalizeTherapistName(therapistName);
 
-  const discussed = (notes?.discussed || []).slice(0, 2);
-  const concerns = (notes?.concerns || []).slice(0, 3);
-  const recommendations = (notes?.recommendations || []).slice(0, 3);
+        const subject = templateSubject || `Thank you for our consultation — ${new Date().toLocaleDateString()}`;
+        const discussed = (notes?.discussed || []).slice(0, 2);
+        const concerns = (notes?.concerns || []).slice(0, 3);
+        const recommendations = (notes?.recommendations || []).slice(0, 3);
 
-  const bulletsRaw = [
-    ...discussed.map(s => `Discussion: ${s}`),
-    ...concerns.map(s => `Concern: ${s}`),
-    ...recommendations.map(s => `Recommendation: ${s}`),
-  ];
-  const bullets = makeConciseBullets(bulletsRaw, 6);
+        const bulletsRaw = [
+          ...discussed.map((s) => `Discussion: ${s}`),
+          ...concerns.map((s) => `Concern: ${s}`),
+          ...recommendations.map((s) => `Recommendation: ${s}`),
+        ];
+        const bullets = makeConciseBullets(bulletsRaw, 6);
 
-  const summarySection = bullets.length
-    ? `Summary:\n${bullets.map(b => `- ${b}`).join('\n')}\n`
-    : '';
+        const summarySection = bullets.length ? `Summary:\n${bullets.map((b) => `- ${b}`).join("\n")}\n` : "";
+        const nextSteps = recommendations.length
+          ? `Next steps:\n${makeConciseBullets(recommendations, 3).map((s) => `- ${s}`).join("\n")}\n`
+          : "";
 
-  const nextSteps = recommendations.length
-    ? `Next steps:\n${makeConciseBullets(recommendations, 3).map(s => `- ${s}`).join('\n')}\n`
-    : '';
+        const defaultSignoff = therapist ? `\nBest regards,\n${therapist}` : `\nBest regards,\n`;
+        let signoff = templateSignoff || defaultSignoff;
+        if (therapist) {
+          const s = String(signoff || "").trimEnd();
+          const placeholderTokenRe = /(\[\s*your name\s*\]|\{\s*your name\s*\}|<\s*your name\s*>)/gi;
+          const placeholderLineRe = /^\s*(?:\[\s*your name\s*\]|\{\s*your name\s*\}|<\s*your name\s*>|your name)\s*$/i;
+          const tokenReplaced = s.replace(placeholderTokenRe, therapist);
+          const lines = tokenReplaced.split("\n");
+          const replacedLines = lines.map((line) => (placeholderLineRe.test(line) ? therapist : line));
+          const replaced = replacedLines.join("\n").trimEnd();
+          if (replaced.toLowerCase().includes(therapist.toLowerCase())) signoff = `\n${replaced}`;
+          else signoff = s ? `\n${s}\n${therapist}` : defaultSignoff;
+        }
 
-  const defaultSignoff = therapist ? `\nBest regards,\n${therapist}` : `\nBest regards,\n`;
-  let signoff = templateSignoff || defaultSignoff;
-  if (therapist) {
-    const s = String(signoff || '').trimEnd();
-    const placeholderTokenRe = /(\[\s*your name\s*\]|\{\s*your name\s*\}|<\s*your name\s*>)/ig;
-    const placeholderLineRe = /^\s*(?:\[\s*your name\s*\]|\{\s*your name\s*\}|<\s*your name\s*>|your name)\s*$/i;
+        return [
+          `Subject: ${subject}`,
+          ``,
+          `Hi ${name},`,
+          ``,
+          therapist ? `This is ${therapist}.` : ``,
+          `Thank you for meeting with me today. Here’s a concise recap of what we covered and the recommended next steps.`,
+          ``,
+          summarySection.trimEnd(),
+          summarySection ? `` : ``,
+          nextSteps.trimEnd(),
+          summarySection || nextSteps ? `` : ``,
+          `If anything above doesn’t match your understanding, reply and I’ll adjust.`,
+          signoff.trimEnd(),
+        ]
+          .filter((line) => line !== "")
+          .join("\n");
+      }
 
-    // Replace placeholder tokens anywhere, and also handle a full placeholder line.
-    const tokenReplaced = s.replace(placeholderTokenRe, therapist);
-    const lines = tokenReplaced.split('\n');
-    const replacedLines = lines.map(line => (placeholderLineRe.test(line) ? therapist : line));
-    const replaced = replacedLines.join('\n').trimEnd();
+      async function enhanceEmailDraft({ transcript, email, clientName, therapistName }) {
+        const baseNotes = localExtractSessionNotes(transcript);
+        try {
+          const { res, data } = await fetchJson(`${API_URL}/webhook/enhance-email`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ transcript, email, clientName, therapistName }),
+          });
+          if (res.ok && data) {
+            const serverNotes = data.notes && typeof data.notes === "object" ? data.notes : null;
+            const mergedNotes = serverNotes ? { ...baseNotes, ...serverNotes } : baseNotes;
+            if (typeof data.enhancedEmail === "string" && data.enhancedEmail.trim())
+              return data.enhancedEmail.trim();
+            return composeFinalEmail({ clientName, therapistName, notes: mergedNotes, templateEmail: email });
+          }
+        } catch {
+          // fall back to local notes only
+        }
+        return composeFinalEmail({ clientName, therapistName, notes: baseNotes, templateEmail: email });
+      }
 
-    if (replaced.toLowerCase().includes(therapist.toLowerCase())) {
-      signoff = `\n${replaced}`;
-    } else {
-      signoff = (s ? `\n${s}\n${therapist}` : defaultSignoff);
-    }
-  }
+      // -----------------------------
+      // Recording + IndexedDB store
+      // -----------------------------
+      let recorder = null,
+        timer = null,
+        seconds = 0;
 
-  return [
-    `Subject: ${subject}`,
-    ``,
-    `Hi ${name},`,
-    ``,
-    therapist ? `This is ${therapist}.` : ``,
-    therapist ? `` : ``,
-    `Thank you for meeting with me today. Here’s a concise recap of what we covered and the recommended next steps.`,
-    ``,
-    summarySection.trimEnd(),
-    summarySection ? `` : ``,
-    nextSteps.trimEnd(),
-    (summarySection || nextSteps) ? `` : ``,
-    `If anything above doesn’t match your understanding, reply and I’ll adjust.`,
-    signoff.trimEnd(),
-  ]
-    .filter(line => line !== '')
-    .join('\n');
-}
+      const IDB_DB = "consultation-recorder";
+      const IDB_STORE = "chunks";
 
-async function enhanceEmailDraft({ transcript, email, clientName, therapistName }) {
-  const baseNotes = localExtractSessionNotes(transcript);
+      function idbOpen() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(IDB_DB, 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
 
-  // Optional server-side enhancement if your backend supports it.
-  // Expected response: { enhancedEmail?: string, notes?: { bullets: string[], discussed: string[], concerns: string[], recommendations: string[] } }
-  try {
-    const { res, data } = await fetchJson(`${API_URL}/webhook/enhance-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript, email, clientName, therapistName }),
-    });
-    if (res.ok && data) {
-      const serverNotes = data.notes && typeof data.notes === 'object' ? data.notes : null;
-      const mergedNotes = serverNotes ? { ...baseNotes, ...serverNotes } : baseNotes;
-      if (typeof data.enhancedEmail === 'string' && data.enhancedEmail.trim()) return data.enhancedEmail.trim();
-      return composeFinalEmail({ clientName, therapistName, notes: mergedNotes, templateEmail: email });
-    }
-  } catch {
-    // Fall back to local notes only.
-  }
+      async function idbReset() {
+        const db = await idbOpen();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          tx.objectStore(IDB_STORE).clear();
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+          };
+        });
+      }
 
-  return composeFinalEmail({ clientName, therapistName, notes: baseNotes, templateEmail: email });
-}
+      async function idbPutChunk(index, blob) {
+        const db = await idbOpen();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          tx.objectStore(IDB_STORE).put(blob, index);
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+          };
+        });
+      }
 
-async function startRecording() {
- try {
- const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
- recorder = new MediaRecorder(stream);
- chunks = []; seconds = 0;
- await idbReset();
- let chunkIndex = 0;
+      async function idbGetAllChunks() {
+        const db = await idbOpen();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(IDB_STORE, "readonly");
+          const store = tx.objectStore(IDB_STORE);
+          const items = [];
+          const cursorReq = store.openCursor();
+          cursorReq.onsuccess = () => {
+            const cursor = cursorReq.result;
+            if (cursor) {
+              items.push({ key: cursor.key, value: cursor.value });
+              cursor.continue();
+            }
+          };
+          tx.oncomplete = () => {
+            db.close();
+            items.sort((a, b) => a.key - b.key);
+            resolve(items.map((i) => i.value));
+          };
+          tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+          };
+        });
+      }
 
- recorder.ondataavailable = async e => {
-  if (e.data && e.data.size > 0) {
-   // Keep memory flat: persist immediately, don't accumulate in RAM.
-   await idbPutChunk(chunkIndex++, e.data);
-  }
- };
- recorder.onstop = () => {
- stream.getTracks().forEach(t => t.stop());
- // We don't rely on in-memory chunks anymore; read from IndexedDB.
- uploadResumable();
- };
+      async function startRecording() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          recorder = new MediaRecorder(stream);
+          seconds = 0;
+          await idbReset();
+          let chunkIndex = 0;
 
- recorder.start(1000);
- show('recording');
- timer = setInterval(() => {
- seconds++;
- document.getElementById('timer').textContent = `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
- }, 1000);
- } catch (err) { alert('Please allow microphone access'); }
-}
+          recorder.ondataavailable = async (e) => {
+            if (e.data && e.data.size > 0) await idbPutChunk(chunkIndex++, e.data);
+          };
 
-function stopRecording() {
- clearInterval(timer);
- show('uploading');
- setTimeout(() => recorder.stop(), 100);
-}
+          recorder.onstop = () => {
+            stream.getTracks().forEach((t) => t.stop());
+            uploadResumable();
+          };
 
-// -----------------------------
-// IndexedDB-backed recording store (prevents RAM blowups for long calls)
-// -----------------------------
-const IDB_DB = 'consultation-recorder';
-const IDB_STORE = 'chunks';
+          recorder.start(1000);
+          show("recording");
+          timer = setInterval(() => {
+            seconds++;
+            const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+            const ss = String(seconds % 60).padStart(2, "0");
+            const el = document.getElementById("timer");
+            if (el) el.textContent = `${mm}:${ss}`;
+          }, 1000);
+        } catch (err) {
+          alert("Please allow microphone access");
+        }
+      }
 
-function idbOpen() {
- return new Promise((resolve, reject) => {
-  const req = indexedDB.open(IDB_DB, 1);
-  req.onupgradeneeded = () => {
-   const db = req.result;
-   if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
-  };
-  req.onsuccess = () => resolve(req.result);
-  req.onerror = () => reject(req.error);
- });
-}
+      function stopRecording() {
+        clearInterval(timer);
+        show("uploading");
+        setTimeout(() => recorder?.stop(), 100);
+      }
 
-async function idbReset() {
- const db = await idbOpen();
- return new Promise((resolve, reject) => {
-  const tx = db.transaction(IDB_STORE, 'readwrite');
-  tx.objectStore(IDB_STORE).clear();
-  tx.oncomplete = () => { db.close(); resolve(); };
-  tx.onerror = () => { db.close(); reject(tx.error); };
- });
-}
+      // -----------------------------
+      // Resumable upload + polling (existing app flow)
+      // -----------------------------
+      async function uploadResumable() {
+        const clientName = document.getElementById("clientName")?.value || "Client";
+        const therapistName = document.getElementById("therapistName")?.value || "";
+        const duration = document.getElementById("timer")?.textContent || "00:00";
+        try {
+          show("uploading");
+          const chunks = await idbGetAllChunks();
+          if (!chunks.length) throw new Error("No audio captured");
 
-async function idbPutChunk(index, blob) {
- const db = await idbOpen();
- return new Promise((resolve, reject) => {
-  const tx = db.transaction(IDB_STORE, 'readwrite');
-  tx.objectStore(IDB_STORE).put(blob, index);
-  tx.oncomplete = () => { db.close(); resolve(); };
-  tx.onerror = () => { db.close(); reject(tx.error); };
- });
-}
+          const startForm = new FormData();
+          startForm.append("clientName", clientName);
+          startForm.append("therapistName", therapistName);
+          startForm.append("duration", duration);
+          const { res: startRes, data: startData } = await fetchJson(`${API_URL}/webhook/upload/start`, {
+            method: "POST",
+            body: startForm,
+          });
+          if (!startRes.ok) throw new Error(startData.error || `Upload start failed (${startRes.status})`);
+          const uploadId = startData.uploadId;
+          const filename = startData.filename;
+          if (!uploadId || !filename) throw new Error("Server did not return uploadId/filename");
 
-async function idbGetAllChunks() {
- const db = await idbOpen();
- return new Promise((resolve, reject) => {
-  const tx = db.transaction(IDB_STORE, 'readonly');
-  const store = tx.objectStore(IDB_STORE);
-  const items = [];
-  const cursorReq = store.openCursor();
-  cursorReq.onsuccess = () => {
-   const cursor = cursorReq.result;
-   if (cursor) {
-    items.push({ key: cursor.key, value: cursor.value });
-    cursor.continue();
-   }
-  };
-  tx.oncomplete = () => { db.close(); items.sort((a,b)=>a.key-b.key); resolve(items.map(i => i.value)); };
-  tx.onerror = () => { db.close(); reject(tx.error); };
- });
-}
+          let offset = 0;
+          for (const blob of chunks) {
+            const buf = await blob.arrayBuffer();
+            const partRes = await fetch(`${API_URL}/webhook/upload/part?uploadId=${encodeURIComponent(uploadId)}`, {
+              method: "POST",
+              cache: "no-store",
+              headers: { ...API_HEADERS, "Content-Type": "application/octet-stream", "X-Upload-Offset": String(offset) },
+              body: buf,
+            });
+            const partText = await partRes.text();
+            let partJson;
+            try {
+              partJson = JSON.parse(partText);
+            } catch {
+              throw new Error(`Non-JSON upload part response (${partRes.status}): ${partText.slice(0, 220)}`);
+            }
+            if (!partRes.ok) throw new Error(partJson.error || `Upload part failed (${partRes.status})`);
+            offset = partJson.receivedBytes ?? offset + buf.byteLength;
+          }
 
-// -----------------------------
-// Resumable upload (part-by-part) to avoid huge single POST
-// -----------------------------
-async function uploadResumable() {
- const clientName = document.getElementById('clientName').value || 'Client';
- const therapistName = document.getElementById('therapistName')?.value || '';
- const duration = document.getElementById('timer').textContent;
- try {
-  show('uploading');
-  const chunks = await idbGetAllChunks();
-  if (!chunks.length) throw new Error('No audio captured');
+          const finishForm = new FormData();
+          finishForm.append("uploadId", uploadId);
+          const { res: finRes, data: finData } = await fetchJson(`${API_URL}/webhook/upload/finish`, {
+            method: "POST",
+            body: finishForm,
+          });
+          if (!finRes.ok) throw new Error(finData.error || `Upload finish failed (${finRes.status})`);
+          if (!finData.success) throw new Error(finData.error || "Upload failed");
 
-  // Start session
-  const startForm = new FormData();
-  startForm.append('clientName', clientName);
-  startForm.append('therapistName', therapistName);
-  startForm.append('duration', duration);
-  const { res: startRes, data: startData } = await fetchJson(`${API_URL}/webhook/upload/start`, { method: 'POST', body: startForm });
-  if (!startRes.ok) throw new Error(startData.error || `Upload start failed (${startRes.status})`);
-  const uploadId = startData.uploadId;
-  const filename = startData.filename;
-  if (!uploadId || !filename) throw new Error('Server did not return uploadId/filename');
+          show("processing");
+          poll(finData.filename || filename);
+        } catch (err) {
+          const el = document.getElementById("errorText");
+          if (el) el.textContent = err?.message || String(err);
+          show("error");
+        }
+      }
 
-  // Send parts sequentially, tracking exact byte offsets
-  let offset = 0;
-  for (const blob of chunks) {
-   const buf = await blob.arrayBuffer();
-   const partRes = await fetch(`${API_URL}/webhook/upload/part?uploadId=${encodeURIComponent(uploadId)}`, {
-    method: 'POST',
-    cache: 'no-store',
-    headers: { ...API_HEADERS, 'Content-Type': 'application/octet-stream', 'X-Upload-Offset': String(offset) },
-    body: buf
-   });
-   const partText = await partRes.text();
-   let partJson;
-   try { partJson = JSON.parse(partText); } catch { throw new Error(`Non-JSON upload part response (${partRes.status}): ${partText.slice(0,220)}`); }
-   if (!partRes.ok) throw new Error(partJson.error || `Upload part failed (${partRes.status})`);
-   offset = partJson.receivedBytes ?? (offset + buf.byteLength);
-  }
+      function poll(filename) {
+        let checks = 0;
+        let netFailStreak = 0;
+        let intervalMs = 2000;
+        let interval = null;
 
-  // Finish
-  const finishForm = new FormData();
-  finishForm.append('uploadId', uploadId);
-  const { res: finRes, data: finData } = await fetchJson(`${API_URL}/webhook/upload/finish`, { method: 'POST', body: finishForm });
-  if (!finRes.ok) throw new Error(finData.error || `Upload finish failed (${finRes.status})`);
-  if (!finData.success) throw new Error(finData.error || 'Upload failed');
-  show('processing');
-  poll(finData.filename || filename);
- } catch (err) {
-  document.getElementById('errorText').textContent = err.message;
-  show('error');
- }
-}
+        const tick = async () => {
+          checks++;
+          if (checks === 150) {
+            clearInterval(interval);
+            intervalMs = 10000;
+            interval = setInterval(tick, intervalMs);
+          }
+          try {
+            const { res, data } = await fetchJson(`${API_URL}/webhook/status?file=${encodeURIComponent(filename)}`);
+            netFailStreak = 0;
 
-function poll(filename) {
- let checks = 0;
- let netFailStreak = 0;
- // Long calls can take 30-90+ minutes on CPU. Never hard-fail at 4 minutes.
- // We switch to slower polling after a few minutes to reduce load.
- let intervalMs = 2000;
- let interval = null;
+            if (!res.ok) {
+              if (data.status === "error" && data.message) {
+                clearInterval(interval);
+                document.getElementById("errorText").textContent = data.message;
+                show("error");
+                return;
+              }
+              throw new Error(data.error || data.message || `Status HTTP ${res.status}`);
+            }
 
- const tick = async () => {
- checks++;
- // After 5 minutes, slow down polling to 10s intervals.
- if (checks === 150) {
-  clearInterval(interval);
-  intervalMs = 10000;
-  interval = setInterval(tick, intervalMs);
- }
- try {
-  const { res, data } = await fetchJson(`${API_URL}/webhook/status?file=${encodeURIComponent(filename)}`);
-  netFailStreak = 0;
+            if (data.status === "done" && data.results) {
+              clearInterval(interval);
+              document.getElementById("resultClient").textContent = `${data.results.clientName} • ${new Date().toLocaleDateString()}`;
+              const transcript = data.results.transcript || "No transcript available";
+              const draftEmail = data.results.email || "No email draft available";
+              document.getElementById("resultTranscript").textContent = transcript;
+              document.getElementById("resultEmail").textContent = await enhanceEmailDraft({
+                transcript,
+                email: draftEmail,
+                clientName: data.results.clientName,
+                therapistName: document.getElementById("therapistName")?.value || "",
+              });
+              show("results");
+              return;
+            }
 
-  if (!res.ok) {
-   if (data.status === 'error' && data.message) {
-    clearInterval(interval);
-    document.getElementById('errorText').textContent = data.message;
-    show('error');
-    return;
-   }
-   throw new Error(data.error || data.message || `Status HTTP ${res.status}`);
-  }
+            if (data.status === "error") {
+              clearInterval(interval);
+              document.getElementById("errorText").textContent = data.message || data.error || "Processing failed";
+              show("error");
+              return;
+            }
+          } catch (e) {
+            netFailStreak++;
+            if (e.message && e.message.startsWith("Non-JSON")) {
+              clearInterval(interval);
+              document.getElementById("errorText").textContent = e.message;
+              show("error");
+              return;
+            }
+            if (netFailStreak >= 8) {
+              clearInterval(interval);
+              document.getElementById("errorText").textContent = "Network error while polling: " + e.message;
+              show("error");
+              return;
+            }
+          }
+        };
 
-  if (data.status === 'done' && data.results) {
-   clearInterval(interval);
-   document.getElementById('resultClient').textContent = `${data.results.clientName} • ${new Date().toLocaleDateString()}`;
-   const transcript = data.results.transcript || 'No transcript available';
-   const draftEmail = data.results.email || 'No email draft available';
-   document.getElementById('resultTranscript').textContent = transcript;
-   document.getElementById('resultEmail').textContent = await enhanceEmailDraft({
-     transcript,
-     email: draftEmail,
-     clientName: data.results.clientName,
-     therapistName: document.getElementById('therapistName')?.value || '',
-   });
-   show('results');
-   return;
-  }
-  if (data.status === 'error') {
-   clearInterval(interval);
-   document.getElementById('errorText').textContent = data.message || data.error || 'Processing failed';
-   show('error');
-   return;
-  }
- } catch (e) {
-  netFailStreak++;
-  if (e.message && e.message.startsWith('Non-JSON')) {
-   clearInterval(interval);
-   document.getElementById('errorText').textContent = e.message;
-   show('error');
-   return;
-  }
-  if (netFailStreak >= 8) {
-   clearInterval(interval);
-   document.getElementById('errorText').textContent = 'Network error while polling: ' + e.message;
-   show('error');
-   return;
-  }
- }
- };
+        interval = setInterval(tick, intervalMs);
+      }
 
- interval = setInterval(tick, intervalMs);
-}
-</script>
-
-</body>
+      // Initial state
+      show("ready");
+    </script>
+  </body>
 </html>
