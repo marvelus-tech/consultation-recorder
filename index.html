@@ -1390,7 +1390,12 @@
               </div>
 
               <p style="color: var(--text-tertiary); font-size: 0.8rem; margin-top: 14px; font-weight: 300">
-                Usually 10–30 seconds
+                Usually 10–30 seconds (first run may take longer while the Whisper model loads).
+              </p>
+              <p style="color: var(--text-tertiary); font-size: 0.78rem; margin-top: 10px; font-weight: 300; line-height: 1.45">
+                If this never finishes, the transcription worker isn’t running on the machine that hosts the API — start
+                <code style="font-size: 0.85em">consultation-webhook/watcher.py</code> (or run
+                <code style="font-size: 0.85em">./start.sh</code> there).
               </p>
             </div>
 
@@ -1546,7 +1551,33 @@
       // -----------------------------
       // Backend configuration (required for current app flow)
       // -----------------------------
-      const API_URL = "https://partible-nonactionable-tyrell.ngrok-free.dev";
+      function normalizeApiUrl(raw) {
+        const v = String(raw || "").trim();
+        if (!v) return "";
+        return v.replace(/\/+$/, "");
+      }
+
+      function resolveApiUrl() {
+        // Priority: query param (?api=...) -> localStorage -> localhost default
+        const params = new URLSearchParams(window.location.search);
+        const fromQuery = normalizeApiUrl(params.get("api"));
+        if (fromQuery) {
+          try {
+            localStorage.setItem("consultationRecorder.apiUrl", fromQuery);
+          } catch {}
+          return fromQuery;
+        }
+
+        let fromStorage = "";
+        try {
+          fromStorage = normalizeApiUrl(localStorage.getItem("consultationRecorder.apiUrl"));
+        } catch {}
+        if (fromStorage) return fromStorage;
+
+        return "http://127.0.0.1:5678";
+      }
+
+      const API_URL = resolveApiUrl();
       const API_HEADERS = {
         Accept: "application/json",
         "ngrok-skip-browser-warning": "69420",
