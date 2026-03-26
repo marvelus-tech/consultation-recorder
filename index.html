@@ -903,6 +903,108 @@
         padding: 14px;
       }
 
+      /* Processing pipeline (driven by /webhook/status stage) */
+      .proc-pipeline {
+        text-align: left;
+      }
+      .proc-headline {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.92);
+        margin: 0 0 14px;
+        letter-spacing: -0.02em;
+      }
+      .proc-track {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 9999px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      .proc-bar {
+        height: 100%;
+        width: 12%;
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+        border-radius: 9999px;
+        transition: width 0.45s ease;
+      }
+      .proc-steps {
+        display: grid;
+        gap: 8px;
+      }
+      .proc-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+        transition: border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+      }
+      .proc-step--wait {
+        opacity: 0.45;
+      }
+      .proc-step--active {
+        opacity: 1;
+        border-color: rgba(0, 240, 255, 0.35);
+        background: rgba(0, 240, 255, 0.06);
+        box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.12);
+      }
+      .proc-step--done {
+        opacity: 1;
+        border-color: rgba(0, 255, 136, 0.22);
+        background: rgba(0, 255, 136, 0.05);
+      }
+      .proc-step-icon {
+        flex-shrink: 0;
+        width: 1.35rem;
+        height: 1.35rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-top: 1px;
+      }
+      .proc-step--wait .proc-step-icon {
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.35);
+      }
+      .proc-step--active .proc-step-icon {
+        background: rgba(0, 240, 255, 0.2);
+        color: var(--accent-cyan);
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      .proc-step--done .proc-step-icon {
+        background: rgba(0, 255, 136, 0.18);
+        color: #00ff88;
+      }
+      .proc-step-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .proc-step-title {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.35;
+      }
+      .proc-step-hint {
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        font-weight: 300;
+        margin-top: 2px;
+      }
+      .proc-sub {
+        margin: 14px 0 0;
+        font-size: 0.78rem;
+        color: var(--text-tertiary);
+        font-weight: 300;
+        line-height: 1.45;
+      }
+
       .field {
         width: 100%;
         background: rgba(255, 255, 255, 0.04);
@@ -1363,40 +1465,45 @@
               <div class="progress-track"><div class="progress-bar"></div></div>
             </div>
 
-            <!-- Processing -->
+            <!-- Processing (live stages from GET /webhook/status: stage + message) -->
             <div id="screen-processing" class="hidden" style="text-align: center; padding: 22px 0">
-              <div
-                style="
-                  display: inline-flex;
-                  align-items: center;
-                  gap: 10px;
-                  padding: 8px 14px;
-                  background: rgba(0, 240, 255, 0.1);
-                  border: 1px solid rgba(0, 240, 255, 0.22);
-                  border-radius: 9999px;
-                  margin-bottom: 14px;
-                "
-              >
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-cyan); animation: pulse 1s infinite"></span>
-                <span style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.82); font-weight: 500">
-                  Processing
-                </span>
+              <div class="proc-pipeline">
+                <p id="processingHeadline" class="proc-headline">Working on it…</p>
+                <div class="proc-track" aria-hidden="true">
+                  <div id="processingBar" class="proc-bar" style="width: 12%"></div>
+                </div>
+                <div id="processingSteps" class="proc-steps" role="list">
+                  <div class="proc-step proc-step--active" data-proc-idx="0" role="listitem">
+                    <div class="proc-step-icon">1</div>
+                    <div class="proc-step-body">
+                      <div class="proc-step-title">In queue</div>
+                      <div class="proc-step-hint">Waiting for the transcription worker</div>
+                    </div>
+                  </div>
+                  <div class="proc-step proc-step--wait" data-proc-idx="1" role="listitem">
+                    <div class="proc-step-icon">2</div>
+                    <div class="proc-step-body">
+                      <div class="proc-step-title">Transcribe audio</div>
+                      <div class="proc-step-hint">Speech → text (longer on first run)</div>
+                    </div>
+                  </div>
+                  <div class="proc-step proc-step--wait" data-proc-idx="2" role="listitem">
+                    <div class="proc-step-icon">3</div>
+                    <div class="proc-step-body">
+                      <div class="proc-step-title">Draft follow-up email</div>
+                      <div class="proc-step-hint">From your transcript</div>
+                    </div>
+                  </div>
+                  <div class="proc-step proc-step--wait" data-proc-idx="3" role="listitem">
+                    <div class="proc-step-icon">4</div>
+                    <div class="proc-step-body">
+                      <div class="proc-step-title">Save to your notes</div>
+                      <div class="proc-step-hint">Update your consultation note</div>
+                    </div>
+                  </div>
+                </div>
+                <p id="processingSub" class="proc-sub">Connecting…</p>
               </div>
-
-              <div style="text-align: left; display: grid; gap: 10px">
-                <div class="soft-panel">🎯 Transcribing audio…</div>
-                <div class="soft-panel" style="opacity: 0.7">📝 Extracting notes…</div>
-                <div class="soft-panel" style="opacity: 0.7">✉️ Drafting follow‑up…</div>
-              </div>
-
-              <p style="color: var(--text-tertiary); font-size: 0.8rem; margin-top: 14px; font-weight: 300">
-                Usually 10–30 seconds (first run may take longer while the Whisper model loads).
-              </p>
-              <p style="color: var(--text-tertiary); font-size: 0.78rem; margin-top: 10px; font-weight: 300; line-height: 1.45">
-                If this never finishes, the transcription worker isn’t running on the machine that hosts the API — start
-                <code style="font-size: 0.85em">consultation-webhook/watcher.py</code> (or run
-                <code style="font-size: 0.85em">./start.sh</code> there).
-              </p>
             </div>
 
             <!-- Results -->
@@ -2051,6 +2158,8 @@
           if (!finRes.ok) throw new Error(finData.error || `Upload finish failed (${finRes.status})`);
           if (!finData.success) throw new Error(finData.error || "Upload failed");
 
+          // If UI stays on "Processing…" forever: the transcription worker must run on the API host —
+          // start consultation-webhook/watcher.py (or run ./start.sh there). server.py alone only creates pending jobs.
           show("processing");
           poll(finData.filename || filename);
         } catch (err) {
@@ -2060,17 +2169,73 @@
         }
       }
 
+      /** Maps API /webhook/status `stage` to step row index (0–3). */
+      function resolveProcessingStageIndex(status, stage) {
+        if (status === "pending") return 0;
+        const s = String(stage || "transcribing").toLowerCase();
+        if (s === "queued") return 0;
+        if (s === "transcribing") return 1;
+        if (s === "drafting") return 2;
+        if (s === "saving") return 3;
+        return 1;
+      }
+
+      function updateProcessingUI(data) {
+        const status = data.status;
+        const msg = data.message || "";
+        const idx = resolveProcessingStageIndex(status, data.stage);
+        const headline = document.getElementById("processingHeadline");
+        const sub = document.getElementById("processingSub");
+        const bar = document.getElementById("processingBar");
+        if (headline) headline.textContent = msg || "Working on it…";
+        if (sub) {
+          sub.textContent =
+            status === "pending"
+              ? "Your upload is saved. When the worker picks it up, the steps below will advance."
+              : "Hang tight — each step updates as the server finishes it.";
+        }
+        if (bar) bar.style.width = `${Math.min(100, ((idx + 1) / 4) * 100)}%`;
+
+        document.querySelectorAll("#processingSteps [data-proc-idx]").forEach((el) => {
+          const i = parseInt(el.getAttribute("data-proc-idx"), 10);
+          const icon = el.querySelector(".proc-step-icon");
+          el.classList.remove("proc-step--done", "proc-step--active", "proc-step--wait");
+          if (i < idx) {
+            el.classList.add("proc-step--done");
+            if (icon) icon.textContent = "✓";
+          } else if (i === idx) {
+            el.classList.add("proc-step--active");
+            if (icon) icon.textContent = String(i + 1);
+          } else {
+            el.classList.add("proc-step--wait");
+            if (icon) icon.textContent = String(i + 1);
+          }
+        });
+      }
+
+      function resetProcessingUI() {
+        updateProcessingUI({
+          status: "pending",
+          stage: "queued",
+          message: "Waiting in queue…",
+        });
+        const sub = document.getElementById("processingSub");
+        if (sub) sub.textContent = "Checking status…";
+      }
+
       function poll(filename) {
         let checks = 0;
         let netFailStreak = 0;
-        let intervalMs = 2000;
+        let intervalMs = 1500;
         let interval = null;
+
+        resetProcessingUI();
 
         const tick = async () => {
           checks++;
-          if (checks === 150) {
+          if (checks === 120) {
             clearInterval(interval);
-            intervalMs = 10000;
+            intervalMs = 4000;
             interval = setInterval(tick, intervalMs);
           }
           try {
@@ -2085,6 +2250,10 @@
                 return;
               }
               throw new Error(data.error || data.message || `Status HTTP ${res.status}`);
+            }
+
+            if (data.status === "pending" || data.status === "processing") {
+              updateProcessingUI(data);
             }
 
             if (data.status === "done" && data.results) {
@@ -2126,6 +2295,7 @@
           }
         };
 
+        tick();
         interval = setInterval(tick, intervalMs);
       }
 
