@@ -177,18 +177,27 @@ function poll(filename) {
  let checks = 0;
  const interval = setInterval(async () => {
  checks++;
- if (checks > 60) { clearInterval(interval); document.getElementById('errorText').textContent = 'Processing timed out. Please reload.'; show('error'); return; }
+ if (checks > 120) { clearInterval(interval); document.getElementById('errorText').textContent = 'Processing timed out. Please reload.'; show('error'); return; }
  try {
- const res = await fetch(`${API_URL}/webhook/status?file=${filename}`);
+ const res = await fetch(`${API_URL}/webhook/status?file=${encodeURIComponent(filename)}`, { cache: 'no-store' });
  const data = await res.json();
  if (data.status === 'done' && data.results) {
  clearInterval(interval);
  document.getElementById('resultClient').textContent = `${data.results.clientName} • ${new Date().toLocaleDateString()}`;
- document.getElementById('resultTranscript').textContent = data.results.transcript;
- document.getElementById('resultEmail').textContent = data.results.email;
+ document.getElementById('resultTranscript').textContent = data.results.transcript || 'No transcript available';
+ document.getElementById('resultEmail').textContent = data.results.email || 'No email draft available';
  show('results');
+ return;
  }
- } catch (e) {}
+ if (data.status === 'error') {
+ clearInterval(interval);
+ document.getElementById('errorText').textContent = data.message || 'Processing failed';
+ show('error');
+ return;
+ }
+ } catch (e) {
+ // transient network errors while polling; keep retrying
+ }
  }, 2000);
 }
 </script>
