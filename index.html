@@ -88,14 +88,20 @@
  </div>
  
  <div style="margin-bottom: 1rem;">
- <p style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 0.5rem;">Transcript</p>
+ <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem;">
+  <p style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin: 0;">transcript</p>
+  <button type="button" onclick="copyResult('resultTranscript', this)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 0.35rem 0.6rem; border-radius: 0.5rem; color: #e5e7eb; cursor: pointer; font-size: 0.75rem; font-weight: 500;">Copy</button>
+ </div>
  <div style="background: rgba(255,255,255,0.05); border-radius: 0.75rem; padding: 0.75rem; max-height: 8rem; overflow-y: auto;">
  <p id="resultTranscript" style="font-size: 0.875rem; color: #ccc;"></p>
  </div>
  </div>
  
  <div style="margin-bottom: 1rem;">
- <p style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 0.5rem;">Email Draft</p>
+ <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem;">
+  <p style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin: 0;">drafted email</p>
+  <button type="button" onclick="copyResult('resultEmail', this)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 0.35rem 0.6rem; border-radius: 0.5rem; color: #e5e7eb; cursor: pointer; font-size: 0.75rem; font-weight: 500;">Copy</button>
+ </div>
  <div style="background: rgba(255,255,255,0.05); border-radius: 0.75rem; padding: 0.75rem; max-height: 10rem; overflow-y: auto;">
  <p id="resultEmail" style="font-size: 0.875rem; color: #ccc; white-space: pre-wrap;"></p>
  </div>
@@ -123,6 +129,35 @@ const API_URL = 'https://partible-nonactionable-tyrell.ngrok-free.dev';
 const API_HEADERS = { 'Accept': 'application/json', 'ngrok-skip-browser-warning': '69420' };
 
 let recorder = null, chunks = [], timer = null, seconds = 0;
+
+async function copyResult(elementId, buttonEl) {
+  const el = document.getElementById(elementId);
+  const text = (el?.textContent || '').trimEnd();
+  if (!text) return;
+
+  const prev = buttonEl?.textContent;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // Fallback for older browsers without Clipboard API.
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    if (buttonEl) buttonEl.textContent = 'Copied';
+  } catch (e) {
+    if (buttonEl) buttonEl.textContent = 'Copy failed';
+  } finally {
+    if (buttonEl) setTimeout(() => (buttonEl.textContent = prev || 'Copy'), 1200);
+  }
+}
 
 function show(id) {
  document.querySelectorAll('[id^="screen-"]').forEach(el => el.classList.add('hidden'));
