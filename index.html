@@ -34,7 +34,8 @@
  <div style="font-size: 0.875rem; color: #999;">📝 Transcript &nbsp; ✉️ Email draft</div>
  </div>
  
- <input type="text" id="clientName" placeholder="Client name" style="width: 100%; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1.5rem; color: white; font-size: 1rem;">
+ <input type="text" id="clientName" placeholder="Client name" style="width: 100%; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; color: white; font-size: 1rem;">
+ <input type="text" id="therapistName" placeholder="Therapist name" style="width: 100%; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1.5rem; color: white; font-size: 1rem;">
  
  <div style="text-align: center;">
  <button onclick="startRecording()" style="width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); border: none; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; animation: pulse 2s infinite;">
@@ -223,6 +224,14 @@ function normalizeClientName(name) {
   return cleaned || 'there';
 }
 
+function normalizeTherapistName(name) {
+  const n = String(name || '').trim();
+  if (!n) return '';
+  // Keep it boring/safe for email signoffs.
+  const cleaned = n.replace(/[^\p{L}\p{N}\s.'-]/gu, '').replace(/\s+/g, ' ').trim();
+  return cleaned || '';
+}
+
 function localExtractSessionNotes(transcript) {
   const sentences = splitSentences(transcript);
   const filtered = sentences.filter(s => {
@@ -289,9 +298,10 @@ function parseEmailTemplate(email) {
   return { subject, signoff };
 }
 
-function composeFinalEmail({ clientName, notes, templateEmail }) {
+function composeFinalEmail({ clientName, therapistName, notes, templateEmail }) {
   const { subject: templateSubject, signoff: templateSignoff } = parseEmailTemplate(templateEmail);
   const name = normalizeClientName(clientName);
+  const therapist = normalizeTherapistName(therapistName);
 
   const subject = templateSubject || `Thank you for our consultation — ${new Date().toLocaleDateString()}`;
 
@@ -314,13 +324,22 @@ function composeFinalEmail({ clientName, notes, templateEmail }) {
     ? `Next steps:\n${makeConciseBullets(recommendations, 3).map(s => `- ${s}`).join('\n')}\n`
     : '';
 
-  const signoff = templateSignoff || `\nBest regards,\n`;
+  const defaultSignoff = therapist ? `\nBest regards,\n${therapist}` : `\nBest regards,\n`;
+  let signoff = templateSignoff || defaultSignoff;
+  if (therapist) {
+    const s = String(signoff || '').trimEnd();
+    if (!s.toLowerCase().includes(therapist.toLowerCase())) {
+      signoff = (s ? `\n${s}\n${therapist}` : defaultSignoff);
+    }
+  }
 
   return [
     `Subject: ${subject}`,
     ``,
     `Hi ${name},`,
     ``,
+    therapist ? `This is ${therapist}.` : ``,
+    therapist ? `` : ``,
     `Thank you for meeting with me today. Here’s a concise recap of what we covered and the recommended next steps.`,
     ``,
     summarySection.trimEnd(),
@@ -334,7 +353,7 @@ function composeFinalEmail({ clientName, notes, templateEmail }) {
     .join('\n');
 }
 
-async function enhanceEmailDraft({ transcript, email, clientName }) {
+async function enhanceEmailDraft({ transcript, email, clientName, therapistName }) {
   const baseNotes = localExtractSessionNotes(transcript);
 
   // Optional server-side enhancement if your backend supports it.
@@ -343,19 +362,19 @@ async function enhanceEmailDraft({ transcript, email, clientName }) {
     const { res, data } = await fetchJson(`${API_URL}/webhook/enhance-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transcript, email, clientName }),
+      body: JSON.stringify({ transcript, email, clientName, therapistName }),
     });
     if (res.ok && data) {
       const serverNotes = data.notes && typeof data.notes === 'object' ? data.notes : null;
       const mergedNotes = serverNotes ? { ...baseNotes, ...serverNotes } : baseNotes;
       if (typeof data.enhancedEmail === 'string' && data.enhancedEmail.trim()) return data.enhancedEmail.trim();
-      return composeFinalEmail({ clientName, notes: mergedNotes, templateEmail: email });
+      return composeFinalEmail({ clientName, therapistName, notes: mergedNotes, templateEmail: email });
     }
   } catch {
     // Fall back to local notes only.
   }
 
-  return composeFinalEmail({ clientName, notes: baseNotes, templateEmail: email });
+  return composeFinalEmail({ clientName, therapistName, notes: baseNotes, templateEmail: email });
 }
 
 async function startRecording() {
@@ -455,6 +474,7 @@ async function idbGetAllChunks() {
 // -----------------------------
 async function uploadResumable() {
  const clientName = document.getElementById('clientName').value || 'Client';
+ const therapistName = document.getElementById('therapistName')?.value || '';
  const duration = document.getElementById('timer').textContent;
  try {
   show('uploading');
@@ -464,6 +484,7 @@ async function uploadResumable() {
   // Start session
   const startForm = new FormData();
   startForm.append('clientName', clientName);
+  startForm.append('therapistName', therapistName);
   startForm.append('duration', duration);
   const { res: startRes, data: startData } = await fetchJson(`${API_URL}/webhook/upload/start`, { method: 'POST', body: startForm });
   if (!startRes.ok) throw new Error(startData.error || `Upload start failed (${startRes.status})`);
@@ -542,6 +563,7 @@ function poll(filename) {
      transcript,
      email: draftEmail,
      clientName: data.results.clientName,
+     therapistName: document.getElementById('therapistName')?.value || '',
    });
    show('results');
    return;
