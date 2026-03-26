@@ -181,6 +181,125 @@ async function fetchJson(url, options = {}) {
  return { res, data, text };
 }
 
+function splitSentences(text) {
+  return String(text || '')
+    .replace(/\s+/g, ' ')
+    .split(/(?<=[.!?])\s+(?=[A-Z0-9"“])/g)
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+function topKByScore(items, k) {
+  return items
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, k)
+    .map(x => x.text);
+}
+
+function makeConciseBullets(lines, max = 6) {
+  const out = [];
+  const seen = new Set();
+  for (const line of lines) {
+    const clean = String(line || '').replace(/\s+/g, ' ').trim();
+    const key = clean.toLowerCase();
+    if (!clean || clean.length < 12) continue;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(clean.length > 180 ? clean.slice(0, 177) + '…' : clean);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+function localExtractSessionNotes(transcript) {
+  const sentences = splitSentences(transcript);
+  const scored = sentences.map(text => {
+    const t = text.toLowerCase();
+    const kw = (re) => (re.test(t) ? 1 : 0);
+    const score =
+      2 * kw(/\b(concern|worried|anxious|fear|stress|overwhelm|panic|struggle|hard|difficult)\b/) +
+      2 * kw(/\b(recommend|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/) +
+      2 * kw(/\b(goal|objective|priority|focus)\b/) +
+      1 * kw(/\b(feel|felt|feeling)\b/) +
+      1 * kw(/\b(because|so that|in order to)\b/) +
+      Math.min(2, Math.max(0, (text.length - 60) / 120));
+    return { text, score };
+  });
+
+  const concerns = topKByScore(
+    scored
+      .map(x => ({ ...x, score: x.score + (/\b(concern|worried|anxious|fear|stress|panic|struggle)\b/i.test(x.text) ? 2 : 0) }))
+      .filter(x => /\b(concern|worried|anxious|fear|stress|panic|struggle|hard|difficult)\b/i.test(x.text)),
+    3
+  );
+
+  const recommendations = topKByScore(
+    scored
+      .map(x => ({ ...x, score: x.score + (/\b(recommend|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/i.test(x.text) ? 2 : 0) }))
+      .filter(x => /\b(recommend|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/i.test(x.text)),
+    3
+  );
+
+  const discussed = topKByScore(scored, 4);
+
+  const bullets = makeConciseBullets([
+    ...discussed,
+    ...concerns.map(s => `Client concern: ${s}`),
+    ...recommendations.map(s => `Recommendation: ${s}`),
+  ], 7);
+
+  return { discussed, concerns, recommendations, bullets };
+}
+
+function spliceNotesIntoEmail(email, notes) {
+  const bullets = (notes?.bullets || []).map(b => `- ${b}`).join('\n');
+  const discussed = (notes?.discussed || []).slice(0, 3).join(' ');
+  const concerns = (notes?.concerns || []).slice(0, 3).map(s => `- ${s}`).join('\n');
+  const recommendations = (notes?.recommendations || []).slice(0, 3).map(s => `- ${s}`).join('\n');
+
+  const block =
+`Session notes (AI-assisted)
+${bullets ? `\n${bullets}\n` : '\n'}
+What we discussed:
+${discussed || '(not available)'}
+
+Client concerns:
+${concerns || '- (not available)'}
+
+Therapist recommendations:
+${recommendations || '- (not available)'}
+`;
+
+  const trimmed = String(email || '').trim();
+  if (!trimmed) return block.trim();
+  return `${block.trim()}\n\n---\n\n${trimmed}\n`;
+}
+
+async function enhanceEmailDraft({ transcript, email, clientName }) {
+  const baseNotes = localExtractSessionNotes(transcript);
+
+  // Optional server-side enhancement if your backend supports it.
+  // Expected response: { enhancedEmail?: string, notes?: { bullets: string[], discussed: string[], concerns: string[], recommendations: string[] } }
+  try {
+    const { res, data } = await fetchJson(`${API_URL}/webhook/enhance-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript, email, clientName }),
+    });
+    if (res.ok && data) {
+      const serverNotes = data.notes && typeof data.notes === 'object' ? data.notes : null;
+      const mergedNotes = serverNotes ? { ...baseNotes, ...serverNotes } : baseNotes;
+      if (typeof data.enhancedEmail === 'string' && data.enhancedEmail.trim()) return data.enhancedEmail.trim();
+      return spliceNotesIntoEmail(email, mergedNotes);
+    }
+  } catch {
+    // Fall back to local notes only.
+  }
+
+  return spliceNotesIntoEmail(email, baseNotes);
+}
+
 async function startRecording() {
  try {
  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -358,8 +477,14 @@ function poll(filename) {
   if (data.status === 'done' && data.results) {
    clearInterval(interval);
    document.getElementById('resultClient').textContent = `${data.results.clientName} • ${new Date().toLocaleDateString()}`;
-   document.getElementById('resultTranscript').textContent = data.results.transcript || 'No transcript available';
-   document.getElementById('resultEmail').textContent = data.results.email || 'No email draft available';
+   const transcript = data.results.transcript || 'No transcript available';
+   const draftEmail = data.results.email || 'No email draft available';
+   document.getElementById('resultTranscript').textContent = transcript;
+   document.getElementById('resultEmail').textContent = await enhanceEmailDraft({
+     transcript,
+     email: draftEmail,
+     clientName: data.results.clientName,
+   });
    show('results');
    return;
   }
