@@ -204,6 +204,9 @@ function makeConciseBullets(lines, max = 6) {
     const clean = String(line || '').replace(/\s+/g, ' ').trim();
     const key = clean.toLowerCase();
     if (!clean || clean.length < 12) continue;
+    // Drop common transcript filler that looks awful in an email summary.
+    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/i.test(clean)) continue;
+    if (/\b(thanks for coming|nice to meet you|how are you)\b/i.test(clean)) continue;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(clean.length > 180 ? clean.slice(0, 177) + '…' : clean);
@@ -212,14 +215,31 @@ function makeConciseBullets(lines, max = 6) {
   return out;
 }
 
+function normalizeClientName(name) {
+  const n = String(name || '').trim();
+  if (!n) return 'there';
+  // Keep it boring/safe for email greetings.
+  const cleaned = n.replace(/[^\p{L}\p{N}\s.'-]/gu, '').replace(/\s+/g, ' ').trim();
+  return cleaned || 'there';
+}
+
 function localExtractSessionNotes(transcript) {
   const sentences = splitSentences(transcript);
-  const scored = sentences.map(text => {
+  const filtered = sentences.filter(s => {
+    const t = s.toLowerCase();
+    if (t.length < 10) return false;
+    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/.test(t)) return false;
+    if (/(thanks for coming|nice to meet you|how are you)\b/.test(t)) return false;
+    return true;
+  });
+
+  const scored = filtered.map(text => {
     const t = text.toLowerCase();
     const kw = (re) => (re.test(t) ? 1 : 0);
     const score =
       2 * kw(/\b(concern|worried|anxious|fear|stress|overwhelm|panic|struggle|hard|difficult)\b/) +
-      2 * kw(/\b(recommend|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/) +
+      2 * kw(/\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/) +
+      2 * kw(/\b(should|could|let's|we can|i want you to|i'd like you to|please)\b/) +
       2 * kw(/\b(goal|objective|priority|focus)\b/) +
       1 * kw(/\b(feel|felt|feeling)\b/) +
       1 * kw(/\b(because|so that|in order to)\b/) +
@@ -229,15 +249,21 @@ function localExtractSessionNotes(transcript) {
 
   const concerns = topKByScore(
     scored
-      .map(x => ({ ...x, score: x.score + (/\b(concern|worried|anxious|fear|stress|panic|struggle)\b/i.test(x.text) ? 2 : 0) }))
-      .filter(x => /\b(concern|worried|anxious|fear|stress|panic|struggle|hard|difficult)\b/i.test(x.text)),
+      .map(x => ({ ...x, score: x.score + (/\b(concern|worried|anxious|fear|stress|panic|struggle|pain|symptom)\b/i.test(x.text) ? 2 : 0) }))
+      .filter(x => /\b(concern|worried|anxious|fear|stress|panic|struggle|hard|difficult|pain|symptom)\b/i.test(x.text)),
     3
   );
 
   const recommendations = topKByScore(
     scored
-      .map(x => ({ ...x, score: x.score + (/\b(recommend|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/i.test(x.text) ? 2 : 0) }))
-      .filter(x => /\b(recommend|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/i.test(x.text)),
+      .map(x => ({
+        ...x,
+        score:
+          x.score +
+          (/\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up)\b/i.test(x.text) ? 2 : 0) +
+          (/\b(should|could|let's|we can|i want you to|i'd like you to|please)\b/i.test(x.text) ? 1 : 0)
+      }))
+      .filter(x => /\b(recommend|recommended|suggest|plan|try|practice|homework|next step|follow[- ]?up|should|could|let's|we can)\b/i.test(x.text)),
     3
   );
 
@@ -245,35 +271,67 @@ function localExtractSessionNotes(transcript) {
 
   const bullets = makeConciseBullets([
     ...discussed,
-    ...concerns.map(s => `Client concern: ${s}`),
-    ...recommendations.map(s => `Recommendation: ${s}`),
+    ...concerns,
+    ...recommendations,
   ], 7);
 
   return { discussed, concerns, recommendations, bullets };
 }
 
-function spliceNotesIntoEmail(email, notes) {
-  const bullets = (notes?.bullets || []).map(b => `- ${b}`).join('\n');
-  const discussed = (notes?.discussed || []).slice(0, 3).join(' ');
-  const concerns = (notes?.concerns || []).slice(0, 3).map(s => `- ${s}`).join('\n');
-  const recommendations = (notes?.recommendations || []).slice(0, 3).map(s => `- ${s}`).join('\n');
+function parseEmailTemplate(email) {
+  const text = String(email || '').trim();
+  const subjectMatch = text.match(/^Subject:\s*(.+)\s*$/mi);
+  const subject = subjectMatch?.[1]?.trim() || '';
 
-  const block =
-`Session notes (AI-assisted)
-${bullets ? `\n${bullets}\n` : '\n'}
-What we discussed:
-${discussed || '(not available)'}
+  // Capture a conventional signoff if present ("Best,", "Sincerely,", etc + following lines).
+  const signoffMatch = text.match(/\n(?:best regards|best|sincerely|kind regards|thanks|thank you),\s*\n[\s\S]*$/i);
+  const signoff = signoffMatch ? signoffMatch[0].trim() : '';
+  return { subject, signoff };
+}
 
-Client concerns:
-${concerns || '- (not available)'}
+function composeFinalEmail({ clientName, notes, templateEmail }) {
+  const { subject: templateSubject, signoff: templateSignoff } = parseEmailTemplate(templateEmail);
+  const name = normalizeClientName(clientName);
 
-Therapist recommendations:
-${recommendations || '- (not available)'}
-`;
+  const subject = templateSubject || `Thank you for our consultation — ${new Date().toLocaleDateString()}`;
 
-  const trimmed = String(email || '').trim();
-  if (!trimmed) return block.trim();
-  return `${block.trim()}\n\n---\n\n${trimmed}\n`;
+  const discussed = (notes?.discussed || []).slice(0, 2);
+  const concerns = (notes?.concerns || []).slice(0, 3);
+  const recommendations = (notes?.recommendations || []).slice(0, 3);
+
+  const bulletsRaw = [
+    ...discussed.map(s => `Discussion: ${s}`),
+    ...concerns.map(s => `Concern: ${s}`),
+    ...recommendations.map(s => `Recommendation: ${s}`),
+  ];
+  const bullets = makeConciseBullets(bulletsRaw, 6);
+
+  const summarySection = bullets.length
+    ? `Summary:\n${bullets.map(b => `- ${b}`).join('\n')}\n`
+    : '';
+
+  const nextSteps = recommendations.length
+    ? `Next steps:\n${makeConciseBullets(recommendations, 3).map(s => `- ${s}`).join('\n')}\n`
+    : '';
+
+  const signoff = templateSignoff || `\nBest regards,\n`;
+
+  return [
+    `Subject: ${subject}`,
+    ``,
+    `Hi ${name},`,
+    ``,
+    `Thank you for meeting with me today. Here’s a concise recap of what we covered and the recommended next steps.`,
+    ``,
+    summarySection.trimEnd(),
+    summarySection ? `` : ``,
+    nextSteps.trimEnd(),
+    (summarySection || nextSteps) ? `` : ``,
+    `If anything above doesn’t match your understanding, reply and I’ll adjust.`,
+    signoff.trimEnd(),
+  ]
+    .filter(line => line !== '')
+    .join('\n');
 }
 
 async function enhanceEmailDraft({ transcript, email, clientName }) {
@@ -291,13 +349,13 @@ async function enhanceEmailDraft({ transcript, email, clientName }) {
       const serverNotes = data.notes && typeof data.notes === 'object' ? data.notes : null;
       const mergedNotes = serverNotes ? { ...baseNotes, ...serverNotes } : baseNotes;
       if (typeof data.enhancedEmail === 'string' && data.enhancedEmail.trim()) return data.enhancedEmail.trim();
-      return spliceNotesIntoEmail(email, mergedNotes);
+      return composeFinalEmail({ clientName, notes: mergedNotes, templateEmail: email });
     }
   } catch {
     // Fall back to local notes only.
   }
 
-  return spliceNotesIntoEmail(email, baseNotes);
+  return composeFinalEmail({ clientName, notes: baseNotes, templateEmail: email });
 }
 
 async function startRecording() {
