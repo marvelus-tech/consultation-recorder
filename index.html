@@ -119,6 +119,9 @@
 
 <script>
 const API_URL = 'https://partible-nonactionable-tyrell.ngrok-free.dev';
+/** Helps ngrok free tier + makes intent explicit to caches / intermediaries */
+const API_HEADERS = { 'Accept': 'application/json', 'ngrok-skip-browser-warning': '69420' };
+
 let recorder = null, chunks = [], timer = null, seconds = 0;
 
 function show(id) {
@@ -126,19 +129,36 @@ function show(id) {
  document.getElementById('screen-' + id).classList.remove('hidden');
 }
 
+/** Always read body as text first so HTML error pages surface instead of silent JSON parse failures */
+async function fetchJson(url, options = {}) {
+ const res = await fetch(url, {
+  ...options,
+  cache: 'no-store',
+  headers: { ...API_HEADERS, ...options.headers },
+ });
+ const text = await res.text();
+ let data;
+ try {
+  data = JSON.parse(text);
+ } catch {
+  throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 220)}`);
+ }
+ return { res, data, text };
+}
+
 async function startRecording() {
  try {
  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
  recorder = new MediaRecorder(stream);
  chunks = []; seconds = 0;
- 
+
  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
  recorder.onstop = () => {
  stream.getTracks().forEach(t => t.stop());
  if (chunks.length === 0) { document.getElementById('errorText').textContent = 'No audio captured'; show('error'); return; }
  upload(new Blob(chunks, { type: 'audio/webm' }));
  };
- 
+
  recorder.start(1000);
  show('recording');
  timer = setInterval(() => {
@@ -159,12 +179,12 @@ async function upload(blob) {
  form.append('audio', blob, 'rec.webm');
  form.append('clientName', document.getElementById('clientName').value || 'Client');
  form.append('duration', document.getElementById('timer').textContent);
- 
+
  try {
- const res = await fetch(`${API_URL}/webhook/consultation`, { method: 'POST', body: form });
- if (!res.ok) throw new Error(`Server error: ${res.status}`);
- const data = await res.json();
+ const { res, data } = await fetchJson(`${API_URL}/webhook/consultation`, { method: 'POST', body: form });
+ if (!res.ok) throw new Error(data.error || `Upload failed (${res.status})`);
  if (!data.success) throw new Error(data.error || 'Upload failed');
+ if (!data.filename) throw new Error('Server did not return filename');
  show('processing');
  poll(data.filename);
  } catch (err) {
@@ -175,28 +195,59 @@ async function upload(blob) {
 
 function poll(filename) {
  let checks = 0;
+ let netFailStreak = 0;
+ const maxChecks = 120;
  const interval = setInterval(async () => {
  checks++;
- if (checks > 120) { clearInterval(interval); document.getElementById('errorText').textContent = 'Processing timed out. Please reload.'; show('error'); return; }
+ if (checks > maxChecks) {
+  clearInterval(interval);
+  document.getElementById('errorText').textContent =
+   'Processing timed out after ' + (maxChecks * 2) + 's. Check backend / watcher logs.';
+  show('error');
+  return;
+ }
  try {
- const res = await fetch(`${API_URL}/webhook/status?file=${encodeURIComponent(filename)}`, { cache: 'no-store' });
- const data = await res.json();
- if (data.status === 'done' && data.results) {
- clearInterval(interval);
- document.getElementById('resultClient').textContent = `${data.results.clientName} • ${new Date().toLocaleDateString()}`;
- document.getElementById('resultTranscript').textContent = data.results.transcript || 'No transcript available';
- document.getElementById('resultEmail').textContent = data.results.email || 'No email draft available';
- show('results');
- return;
- }
- if (data.status === 'error') {
- clearInterval(interval);
- document.getElementById('errorText').textContent = data.message || 'Processing failed';
- show('error');
- return;
- }
+  const { res, data } = await fetchJson(`${API_URL}/webhook/status?file=${encodeURIComponent(filename)}`);
+  netFailStreak = 0;
+
+  if (!res.ok) {
+   if (data.status === 'error' && data.message) {
+    clearInterval(interval);
+    document.getElementById('errorText').textContent = data.message;
+    show('error');
+    return;
+   }
+   throw new Error(data.error || data.message || `Status HTTP ${res.status}`);
+  }
+
+  if (data.status === 'done' && data.results) {
+   clearInterval(interval);
+   document.getElementById('resultClient').textContent = `${data.results.clientName} • ${new Date().toLocaleDateString()}`;
+   document.getElementById('resultTranscript').textContent = data.results.transcript || 'No transcript available';
+   document.getElementById('resultEmail').textContent = data.results.email || 'No email draft available';
+   show('results');
+   return;
+  }
+  if (data.status === 'error') {
+   clearInterval(interval);
+   document.getElementById('errorText').textContent = data.message || data.error || 'Processing failed';
+   show('error');
+   return;
+  }
  } catch (e) {
- // transient network errors while polling; keep retrying
+  netFailStreak++;
+  if (e.message && e.message.startsWith('Non-JSON')) {
+   clearInterval(interval);
+   document.getElementById('errorText').textContent = e.message;
+   show('error');
+   return;
+  }
+  if (netFailStreak >= 8) {
+   clearInterval(interval);
+   document.getElementById('errorText').textContent = 'Network error while polling: ' + e.message;
+   show('error');
+   return;
+  }
  }
  }, 2000);
 }
