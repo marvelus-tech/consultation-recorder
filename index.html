@@ -4,124 +4,615 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>MarvelUs — Consultation Recorder</title>
- <script src="https://cdn.tailwindcss.com"></script>
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
  <style>
- body { background: #0a0a0a; color: white; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+ :root{
+  --navy: #0A192F;
+  --offwhite: #FAFBFC;
+  --muted: rgba(10, 25, 47, 0.62);
+  --hairline: rgba(10, 25, 47, 0.10);
+  --card: rgba(250, 251, 252, 0.82);
+  --shadow: 0 24px 60px rgba(10, 25, 47, 0.14);
+  --accent: #FF6B6B;
+  --accent2: #ff8a72;
+ }
+
+ * { box-sizing: border-box; }
+ html, body { height: 100%; }
+ body {
+  margin: 0;
+  background: var(--offwhite);
+  color: var(--navy);
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+ }
+
  .hidden { display: none !important; }
+
+ .page { min-height: 100%; }
+
+ .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(250, 251, 252, 0.72);
+  border-bottom: 1px solid var(--hairline);
+ }
+ .nav-inner{
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+ }
+ .brand{
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+ }
+ .brand-mark{
+  letter-spacing: -0.02em;
+  font-weight: 600;
+ }
+ .brand-tag{
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 13px;
+ }
+ .nav-links{
+  display: none;
+  gap: 18px;
+  align-items: center;
+ }
+ .nav-links a{
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+ }
+ .nav-links a:hover{ color: var(--navy); }
+ @media (min-width: 900px){
+  .nav-links{ display: inline-flex; }
+ }
+
+ .btn{
+  appearance: none;
+  border: 1px solid rgba(10, 25, 47, 0.10);
+  background: rgba(10, 25, 47, 0.02);
+  color: var(--navy);
+  border-radius: 9999px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+ }
+ .btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(10, 25, 47, 0.10);
+  border-color: rgba(10, 25, 47, 0.16);
+ }
+ .btn-primary{
+  border: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+ }
+
+ .hero{
+  position: relative;
+  min-height: 100vh;
+  padding: 96px 18px 44px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+ }
+ .hero-inner{
+  max-width: 1120px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
+ }
+ @media (min-width: 980px){
+  .hero-inner{ grid-template-columns: 1.1fr 0.9fr; }
+ }
+ .hero-title{
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  margin: 0 0 12px;
+  line-height: 1.04;
+  font-size: clamp(42px, 5vw, 64px);
+ }
+ .hero-sub{
+  margin: 0 0 18px;
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 54ch;
+ }
+ .hero-ctas{ display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+ .scroll-indicator{
+  margin-top: 24px;
+  height: 28px;
+  width: 1px;
+  background: rgba(10, 25, 47, 0.20);
+  position: relative;
+  overflow: hidden;
+ }
+ .scroll-indicator::after{
+  content:"";
+  position:absolute;
+  left:0; top:-12px;
+  height: 12px;
+  width: 1px;
+  background: rgba(10, 25, 47, 0.55);
+  animation: scrollLine 1.6s ease-in-out infinite;
+ }
+ @keyframes scrollLine{
+  0%{ transform: translateY(0); opacity: 0; }
+  20%{ opacity: 1; }
+  60%{ opacity: 1; }
+  100%{ transform: translateY(40px); opacity: 0; }
+ }
+
+ .wave-canvas{
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  pointer-events: none;
+  filter: blur(0px);
+ }
+ .hero-glow{
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(closest-side at 18% 20%, rgba(255,107,107,0.22), transparent 55%),
+    radial-gradient(closest-side at 78% 32%, rgba(255,138,114,0.16), transparent 60%),
+    radial-gradient(closest-side at 55% 78%, rgba(10,25,47,0.09), transparent 62%);
+  pointer-events: none;
+ }
+
+ .moment-section{
+  padding: 70px 18px;
+  border-top: 1px solid var(--hairline);
+ }
+ .moment-inner{
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+ }
+ @media (min-width: 980px){
+  .moment-inner{ grid-template-columns: 1fr 1fr; gap: 36px; }
+ }
+ .moment-kicker{
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+ }
+ .moment-title{
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: clamp(24px, 3vw, 34px);
+ }
+ .moment-copy{
+  margin: 0;
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 62ch;
+ }
+ .watermark{
+  position: relative;
+ }
+ .watermark::before{
+  content: attr(data-no);
+  position: absolute;
+  top: -26px;
+  left: -4px;
+  font-size: 72px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: rgba(10, 25, 47, 0.06);
+  pointer-events: none;
+ }
+ .moment-card{
+  border: 1px solid var(--hairline);
+  border-radius: 22px;
+  background: rgba(250, 251, 252, 0.65);
+  box-shadow: 0 18px 44px rgba(10, 25, 47, 0.08);
+  padding: 18px;
+  min-height: 168px;
+ }
+ .poetry{
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Inter";
+  font-size: 14px;
+  color: rgba(10, 25, 47, 0.78);
+  line-height: 1.55;
+  white-space: pre-wrap;
+ }
+
+ .trust{
+  padding: 44px 18px 80px;
+  border-top: 1px solid var(--hairline);
+ }
+ .trust-inner{
+  max-width: 1120px;
+  margin: 0 auto;
+ }
+ .trust-row{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  background: rgba(10, 25, 47, 0.02);
+ }
+ @media (min-width: 860px){
+  .trust-row{
+   grid-template-columns: 1fr 1fr 1fr;
+   gap: 12px;
+  }
+ }
+ .trust-item{
+  font-size: 14px;
+  color: rgba(10, 25, 47, 0.80);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+ }
+ .trust-item span{
+  font-weight: 400;
+  color: var(--muted);
+ }
+
+ .recorder-wrap{
+  position: relative;
+ }
+ .recorder-shell{
+  width: 100%;
+  max-width: 420px;
+  margin-left: auto;
+  padding-top: 16px;
+ }
+ @media (max-width: 979px){
+  .recorder-shell{ margin-right: auto; }
+ }
+ .recorder-card{
+  background: var(--card);
+  border: 1px solid rgba(10, 25, 47, 0.10);
+  border-radius: 26px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+ }
+
+ .recorder-top{
+  text-align: left;
+  margin-bottom: 14px;
+ }
+ .recorder-top .mini{
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+ }
+ .recorder-top .promise{
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--muted);
+  margin: 0;
+ }
+
+ .field{
+  width: 100%;
+  background: rgba(250, 251, 252, 0.85);
+  border: 1px solid rgba(10, 25, 47, 0.14);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  color: var(--navy);
+  font-size: 15px;
+  outline: none;
+  transition: box-shadow 120ms ease, border-color 120ms ease;
+ }
+ .field:focus{
+  border-color: rgba(255, 107, 107, 0.55);
+  box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.14);
+ }
+ .pill{
+  border-radius: 9999px;
+ }
+
  @keyframes spin { to { transform: rotate(360deg); } }
- .spinner { border: 3px solid rgba(255,255,255,0.1); border-top-color: #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
- @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+ .spinner { border: 3px solid rgba(10,25,47,0.12); border-top-color: var(--accent); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+
+ @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
  .animate-pulse { animation: pulse 2s infinite; }
- .progress-bar { height: 4px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; animation: progress 2s ease-in-out infinite; width: 60%; }
+ .progress-bar { height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; animation: progress 2s ease-in-out infinite; width: 60%; }
  @keyframes progress { 0% { transform: translateX(-100%); } 50% { transform: translateX(200%); } 100% { transform: translateX(-100%); } }
+
+ .icon-btn{
+  background: rgba(10,25,47,0.03);
+  border: 1px solid rgba(10,25,47,0.10);
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.6rem;
+  color: rgba(10,25,47,0.85);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+ }
+ .icon-btn:hover{ border-color: rgba(10,25,47,0.16); }
+
+ .soft-panel{
+  background: rgba(10,25,47,0.03);
+  border: 1px solid rgba(10,25,47,0.08);
+  border-radius: 14px;
+  padding: 12px;
+ }
+ .soft-panel strong{ font-weight: 600; }
+
+ .footer{
+  padding: 22px 18px 30px;
+  color: rgba(10,25,47,0.50);
+  font-size: 12px;
+  border-top: 1px solid var(--hairline);
+ }
+ .footer-inner{
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+ }
+ .footer a{ color: inherit; text-decoration: none; }
+ .footer a:hover{ color: rgba(10,25,47,0.75); }
  </style>
 </head>
 <body>
+<div class="page">
+  <header class="nav" role="banner">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="MarvelUs">
+        <span class="brand-mark">MarvelUs</span>
+        <span class="brand-tag">Conversations worth keeping</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#how">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#providers">For providers</a>
+      </nav>
+      <button class="btn btn-primary" type="button" onclick="scrollToRecorder()">Get MarvelUs</button>
+    </div>
+  </header>
 
-<div style="width: 100%; max-width: 420px;">
- <div style="text-align: center; margin-bottom: 2rem;">
- <div style="font-size: 2rem; margin-bottom: 0.5rem;">✦</div>
- <h1 style="font-size: 1.5rem; font-weight: bold;">MarvelUs</h1>
- <p style="color: #666; font-size: 0.875rem;">Consultation Recorder</p>
- </div>
+  <main id="top">
+    <section class="hero" aria-label="Hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <canvas id="wave" class="wave-canvas" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <div>
+          <h1 class="hero-title">Never miss a word that matters</h1>
+          <p class="hero-sub">MarvelUs turns consultations into clear, actionable takeaways—so you can focus on the person in front of you, not your notes.</p>
+          <div class="hero-ctas">
+            <button class="btn btn-primary" type="button" onclick="scrollToRecorder()">Begin your first recording</button>
+            <a class="btn" href="#privacy" style="text-decoration:none; display:inline-flex; align-items:center;">Privacy, in plain English</a>
+          </div>
+          <div class="scroll-indicator" aria-hidden="true"></div>
+        </div>
 
- <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 1.5rem; padding: 1.5rem;">
+        <div class="recorder-wrap" aria-label="Recorder">
+          <div class="recorder-shell" id="recorder">
+            <div class="recorder-card">
+              <div class="recorder-top">
+                <p class="mini">Your consultation space</p>
+                <p class="promise">Record now. We’ll draft the recap you wish you had.</p>
+              </div>
  
  <!-- Ready -->
  <div id="screen-ready">
- <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 0.75rem;">
- <p style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 0.5rem;">You'll receive:</p>
- <div style="font-size: 0.875rem; color: #999;">📝 Transcript &nbsp; ✉️ Email draft</div>
+ <div class="soft-panel" style="margin-bottom: 12px;">
+   <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+     <div>
+       <div style="font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;">You’ll receive</div>
+       <div style="font-size:14px; color:rgba(10,25,47,0.82); font-weight:500;">Transcript + a drafted follow‑up email</div>
+     </div>
+   </div>
  </div>
- 
- <input type="text" id="clientName" placeholder="Client name" style="width: 100%; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem; color: white; font-size: 1rem;">
- <input type="text" id="therapistName" placeholder="Therapist name" style="width: 100%; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.75rem; padding: 0.75rem 1rem; margin-bottom: 1.5rem; color: white; font-size: 1rem;">
- 
- <div style="text-align: center;">
- <button onclick="startRecording()" style="width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, #667eea, #764ba2); border: none; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; animation: pulse 2s infinite;">
- 🎙️
- </button>
- <p style="color: #999; margin-top: 1rem;">Tap to record</p>
+
+ <input type="text" id="clientName" class="field" placeholder="Patient / client name">
+ <input type="text" id="therapistName" class="field" placeholder="Clinician / therapist name (optional)" style="margin-bottom:14px;">
+
+ <div style="text-align:center;">
+   <button onclick="startRecording()" type="button" aria-label="Start recording" style="width: 6rem; height: 6rem; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); border: none; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto; animation: pulse 2s infinite; box-shadow: 0 18px 44px rgba(255,107,107,0.20);">
+     🎙️
+   </button>
+   <p style="color: var(--muted); margin-top: 12px; font-weight:300;">Tap to record</p>
  </div>
  </div>
 
  <!-- Recording -->
- <div id="screen-recording" class="hidden" style="text-align: center; padding: 2rem 0;">
- <div style="width: 6rem; height: 6rem; border-radius: 50%; background: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto; animation: pulse 1s infinite;">🔴</div>
- <p style="color: #999; margin-top: 1rem; margin-bottom: 0.5rem;">Recording...</p>
- <p id="timer" style="font-size: 3rem; font-family: monospace;">00:00</p>
- <button onclick="stopRecording()" style="background: #ef4444; color: white; border: none; padding: 0.75rem 2rem; border-radius: 9999px; font-size: 1rem; margin-top: 1rem; cursor: pointer;">Stop</button>
+ <div id="screen-recording" class="hidden" style="text-align: center; padding: 26px 0 8px;">
+ <div style="width: 6rem; height: 6rem; border-radius: 50%; background: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto; animation: pulse 1s infinite; box-shadow: 0 18px 44px rgba(239,68,68,0.18);">🔴</div>
+ <p style="color: var(--muted); margin-top: 14px; margin-bottom: 6px; font-weight:300;">Recording…</p>
+ <p id="timer" style="font-size: 3rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; letter-spacing:-0.02em;">00:00</p>
+ <button class="btn btn-primary" onclick="stopRecording()" type="button" style="margin-top: 10px; background: #ef4444;">Stop</button>
  </div>
 
  <!-- Uploading -->
  <div id="screen-uploading" class="hidden" style="text-align: center; padding: 2rem 0;">
  <div class="spinner" style="margin: 0 auto 1rem;"></div>
- <p style="font-size: 1.25rem;">Uploading...</p>
- <div style="margin-top: 1rem; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+ <p style="font-size: 1.1rem; font-weight:500;">Uploading…</p>
+ <div style="margin-top: 1rem; height: 4px; background: rgba(10,25,47,0.10); border-radius: 2px; overflow: hidden;">
  <div class="progress-bar"></div>
  </div>
  </div>
 
  <!-- Processing -->
  <div id="screen-processing" class="hidden" style="text-align: center; padding: 1.5rem 0;">
- <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: rgba(102,126,234,0.1); border: 1px solid rgba(102,126,234,0.2); border-radius: 9999px; margin-bottom: 1rem;">
- <span style="width: 8px; height: 8px; border-radius: 50%; background: #818cf8; animation: pulse 1s infinite;"></span>
- <span style="font-size: 0.875rem; color: #818cf8;">AI Processing</span>
+ <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; background: rgba(255,107,107,0.10); border: 1px solid rgba(255,107,107,0.20); border-radius: 9999px; margin-bottom: 1rem;">
+ <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1s infinite;"></span>
+ <span style="font-size: 0.875rem; color: rgba(10,25,47,0.82); font-weight:500;">Preparing your consultation space</span>
  </div>
  
  <div style="text-align: left;">
- <div style="padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 0.5rem; margin-bottom: 0.5rem;">🎯 Transcribing audio...</div>
- <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem; margin-bottom: 0.5rem; opacity: 0.5;">📝 Extracting notes...</div>
- <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem; opacity: 0.5;">✉️ Drafting email...</div>
+ <div style="padding: 0.75rem; background: rgba(10,25,47,0.03); border: 1px solid rgba(10,25,47,0.06); border-radius: 0.75rem; margin-bottom: 0.5rem;">🎯 Transcribing audio…</div>
+ <div style="padding: 0.75rem; background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.05); border-radius: 0.75rem; margin-bottom: 0.5rem; opacity: 0.62;">📝 Extracting notes…</div>
+ <div style="padding: 0.75rem; background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.05); border-radius: 0.75rem; opacity: 0.62;">✉️ Drafting follow‑up…</div>
  </div>
  
- <p style="color: #666; font-size: 0.75rem; margin-top: 1rem;">This takes 10-30 seconds</p>
+ <p style="color: var(--muted); font-size: 0.75rem; margin-top: 1rem; font-weight:300;">Usually 10–30 seconds</p>
  </div>
 
  <!-- Results -->
  <div id="screen-results" class="hidden">
- <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.06);">
- <div style="width: 2.5rem; height: 2.5rem; background: rgba(16,185,129,0.2); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: #34d399;">✓</div>
+ <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(10,25,47,0.10);">
+ <div style="width: 2.5rem; height: 2.5rem; background: rgba(16,185,129,0.14); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; color: #059669; border: 1px solid rgba(5,150,105,0.20);">✓</div>
  <div>
- <p style="font-weight: 500;">Done!</p>
- <p id="resultClient" style="font-size: 0.75rem; color: #666;"></p>
+ <p style="font-weight: 600; letter-spacing:-0.01em;">Ready.</p>
+ <p id="resultClient" style="font-size: 0.75rem; color: var(--muted);"></p>
  </div>
  </div>
  
  <div style="margin-bottom: 1rem;">
  <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem;">
-  <p style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin: 0;">drafted email</p>
-  <button type="button" onclick="copyResult('resultEmail', this)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 0.35rem 0.6rem; border-radius: 0.5rem; color: #e5e7eb; cursor: pointer; font-size: 0.75rem; font-weight: 500;">Copy</button>
+  <p style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing:0.12em; margin: 0;">drafted email</p>
+  <button type="button" onclick="copyResult('resultEmail', this)" class="icon-btn">Copy</button>
  </div>
- <div style="background: rgba(255,255,255,0.05); border-radius: 0.75rem; padding: 0.75rem; max-height: 10rem; overflow-y: auto;">
- <p id="resultEmail" style="font-size: 0.875rem; color: #ccc; white-space: pre-wrap;"></p>
+ <div style="background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.08); border-radius: 0.9rem; padding: 0.75rem; max-height: 10rem; overflow-y: auto;">
+ <p id="resultEmail" style="font-size: 0.875rem; color: rgba(10,25,47,0.84); white-space: pre-wrap; font-weight:300;"></p>
  </div>
  </div>
  
  <div style="margin-bottom: 1rem;">
  <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem;">
-  <p style="font-size: 0.75rem; color: #666; text-transform: uppercase; margin: 0;">transcript</p>
-  <button type="button" onclick="copyResult('resultTranscript', this)" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 0.35rem 0.6rem; border-radius: 0.5rem; color: #e5e7eb; cursor: pointer; font-size: 0.75rem; font-weight: 500;">Copy</button>
+  <p style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing:0.12em; margin: 0;">transcript</p>
+  <button type="button" onclick="copyResult('resultTranscript', this)" class="icon-btn">Copy</button>
  </div>
- <div style="background: rgba(255,255,255,0.05); border-radius: 0.75rem; padding: 0.75rem; max-height: 8rem; overflow-y: auto;">
- <p id="resultTranscript" style="font-size: 0.875rem; color: #ccc;"></p>
+ <div style="background: rgba(10,25,47,0.02); border: 1px solid rgba(10,25,47,0.08); border-radius: 0.9rem; padding: 0.75rem; max-height: 8rem; overflow-y: auto;">
+ <p id="resultTranscript" style="font-size: 0.875rem; color: rgba(10,25,47,0.84); font-weight:300;"></p>
  </div>
  </div>
  
- <button onclick="location.reload()" style="width: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border: none; padding: 0.75rem; border-radius: 0.75rem; color: white; font-weight: 500; cursor: pointer;">New Recording</button>
+ <button class="btn btn-primary" onclick="location.reload()" type="button" style="width:100%;">New recording</button>
  </div>
 
  <!-- Error -->
  <div id="screen-error" class="hidden" style="text-align: center; padding: 2rem 0;">
  <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚠️</div>
- <p style="color: #f87171; font-weight: 500; margin-bottom: 0.5rem;">Something went wrong</p>
- <p id="errorText" style="color: #666; font-size: 0.875rem; margin-bottom: 1rem;"></p>
- <button onclick="location.reload()" style="background: #374151; border: none; padding: 0.5rem 1.5rem; border-radius: 0.5rem; color: white; cursor: pointer;">Reload</button>
+ <p style="color: #ef4444; font-weight: 600; margin-bottom: 0.5rem;">Something went wrong</p>
+ <p id="errorText" style="color: var(--muted); font-size: 0.875rem; margin-bottom: 1rem; font-weight:300;"></p>
+ <button class="btn" onclick="location.reload()" type="button">Reload</button>
  </div>
 
- </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
- <p style="text-align: center; color: #444; font-size: 0.75rem; margin-top: 2rem;">Powered by MarvelUs</p>
+    <section class="moment-section" id="how" aria-label="How it works">
+      <div class="moment-inner">
+        <div class="watermark" data-no="01">
+          <p class="moment-kicker">During the visit</p>
+          <h2 class="moment-title">Stay present.</h2>
+          <p class="moment-copy">Hit record, then focus on the conversation. No frantic note‑taking. No “I’ll remember it later.”</p>
+        </div>
+        <div class="moment-card" aria-hidden="true">
+          <div class="poetry">“Let’s take this one step at a time.
+
+What matters most today is clarity.”</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="moment-section" aria-label="Clarity after">
+      <div class="moment-inner">
+        <div class="watermark" data-no="02">
+          <p class="moment-kicker">The clarity after</p>
+          <h2 class="moment-title">A recap you can actually use.</h2>
+          <p class="moment-copy">Clean transcript. Key points. Next steps. Written like a human—so it’s easy to act on.</p>
+        </div>
+        <div class="moment-card" aria-hidden="true">
+          <div class="poetry"><strong>Summary</strong>
+- Main concern: symptoms increased this week
+- Plan: adjust routine + follow‑up in 2 weeks
+- Next step: start with the smallest change you can keep</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="moment-section" aria-label="Share with family">
+      <div class="moment-inner">
+        <div class="watermark" data-no="03">
+          <p class="moment-kicker">Sharing, made simple</p>
+          <h2 class="moment-title">Send the follow‑up in minutes.</h2>
+          <p class="moment-copy">A drafted email recap you can copy, edit, and send—so everyone is aligned.</p>
+        </div>
+        <div class="moment-card" aria-hidden="true">
+          <div class="poetry">Subject: Thank you for our consultation
+
+Hi there,
+
+Here’s a concise recap and next steps…</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust" id="privacy" aria-label="Privacy">
+      <div class="trust-inner">
+        <div style="max-width:62ch; margin-bottom:14px;">
+          <p class="moment-kicker">Privacy</p>
+          <h2 class="moment-title" style="margin-bottom:8px;">Respect is a feature.</h2>
+          <p class="moment-copy">This demo runs through a backend endpoint (see `API_URL` in the file). If you want true on‑device processing, we can swap in local transcription and keep everything offline.</p>
+        </div>
+        <div class="trust-row" role="list">
+          <div class="trust-item" role="listitem">HIPAA readiness <span>(depends on deployment)</span></div>
+          <div class="trust-item" role="listitem">Encryption <span>(in transit + at rest)</span></div>
+          <div class="trust-item" role="listitem">Data minimization <span>(store only what you need)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="moment-section" id="providers" aria-label="For providers">
+      <div class="moment-inner">
+        <div class="watermark" data-no="P">
+          <p class="moment-kicker">For providers</p>
+          <h2 class="moment-title">A calmer workflow.</h2>
+          <p class="moment-copy">Use it as a lightweight capture tool: record, receive a structured recap, and keep your documentation consistent.</p>
+        </div>
+        <div class="moment-card" aria-hidden="true">
+          <div class="poetry"><strong>Tip</strong>
+Pair this with your clinic’s template language so the drafted email matches your voice.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <div><span class="brand-mark">MarvelUs</span> <span style="color:rgba(10,25,47,0.45);">©</span> <span id="year"></span></div>
+      <div style="display:flex; gap:14px; align-items:center;">
+        <a href="#privacy">Privacy</a>
+        <a href="#top">Back to top</a>
+      </div>
+    </div>
+  </footer>
 </div>
 
 <script>
@@ -130,6 +621,13 @@ const API_URL = 'https://partible-nonactionable-tyrell.ngrok-free.dev';
 const API_HEADERS = { 'Accept': 'application/json', 'ngrok-skip-browser-warning': '69420' };
 
 let recorder = null, chunks = [], timer = null, seconds = 0;
+
+function scrollToRecorder() {
+  const el = document.getElementById('recorder');
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => document.getElementById('clientName')?.focus(), 400);
+}
 
 async function copyResult(elementId, buttonEl) {
   const el = document.getElementById(elementId);
@@ -164,6 +662,63 @@ function show(id) {
  document.querySelectorAll('[id^="screen-"]').forEach(el => el.classList.add('hidden'));
  document.getElementById('screen-' + id).classList.remove('hidden');
 }
+
+// Subtle waveform animation for hero background (no external deps).
+(function initWave(){
+  const canvas = document.getElementById('wave');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  let w = 0, h = 0, t = 0;
+
+  function resize(){
+    const rect = canvas.getBoundingClientRect();
+    w = Math.max(1, Math.floor(rect.width));
+    h = Math.max(1, Math.floor(rect.height));
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function draw(){
+    t += 0.012;
+    ctx.clearRect(0, 0, w, h);
+
+    const mid = Math.floor(h * 0.52);
+    const amp = Math.max(12, Math.floor(h * 0.06));
+    const lines = 3;
+
+    for (let li = 0; li < lines; li++){
+      const phase = t + li * 0.7;
+      const alpha = 0.16 - li * 0.035;
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 4){
+        const nx = x / w;
+        const envelope = Math.sin(Math.PI * nx);
+        const y =
+          mid
+          + Math.sin(nx * 10 + phase) * amp * envelope
+          + Math.sin(nx * 22 + phase * 1.5) * (amp * 0.38) * envelope;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.lineWidth = 1.2;
+      ctx.strokeStyle = `rgba(255, 107, 107, ${Math.max(0.04, alpha)})`;
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+  requestAnimationFrame(draw);
+})();
+
+// Footer year
+document.getElementById('year').textContent = String(new Date().getFullYear());
 
 /** Always read body as text first so HTML error pages surface instead of silent JSON parse failures */
 async function fetchJson(url, options = {}) {
