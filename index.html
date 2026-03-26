@@ -205,9 +205,9 @@ function makeConciseBullets(lines, max = 6) {
     const clean = String(line || '').replace(/\s+/g, ' ').trim();
     const key = clean.toLowerCase();
     if (!clean || clean.length < 12) continue;
-    // Drop common transcript filler that looks awful in an email summary.
-    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/i.test(clean)) continue;
-    if (/\b(thanks for coming|nice to meet you|how are you)\b/i.test(clean)) continue;
+    // Drop pure pleasantries, but keep long lines that contain real content.
+    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/i.test(clean) && clean.length < 40) continue;
+    if (/\b(thanks for coming|nice to meet you|how are you)\b/i.test(clean) && clean.length < 60) continue;
     if (seen.has(key)) continue;
     seen.add(key);
     out.push(clean.length > 180 ? clean.slice(0, 177) + '…' : clean);
@@ -237,8 +237,8 @@ function localExtractSessionNotes(transcript) {
   const filtered = sentences.filter(s => {
     const t = s.toLowerCase();
     if (t.length < 10) return false;
-    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/.test(t)) return false;
-    if (/(thanks for coming|nice to meet you|how are you)\b/.test(t)) return false;
+    if (/^(hi|hello|hey|thanks|thank you|goodbye|bye)\b/.test(t) && t.length < 40) return false;
+    if (/(thanks for coming|nice to meet you|how are you)\b/.test(t) && t.length < 60) return false;
     return true;
   });
 
@@ -328,7 +328,18 @@ function composeFinalEmail({ clientName, therapistName, notes, templateEmail }) 
   let signoff = templateSignoff || defaultSignoff;
   if (therapist) {
     const s = String(signoff || '').trimEnd();
-    if (!s.toLowerCase().includes(therapist.toLowerCase())) {
+    const placeholderTokenRe = /(\[\s*your name\s*\]|\{\s*your name\s*\}|<\s*your name\s*>)/ig;
+    const placeholderLineRe = /^\s*(?:\[\s*your name\s*\]|\{\s*your name\s*\}|<\s*your name\s*>|your name)\s*$/i;
+
+    // Replace placeholder tokens anywhere, and also handle a full placeholder line.
+    const tokenReplaced = s.replace(placeholderTokenRe, therapist);
+    const lines = tokenReplaced.split('\n');
+    const replacedLines = lines.map(line => (placeholderLineRe.test(line) ? therapist : line));
+    const replaced = replacedLines.join('\n').trimEnd();
+
+    if (replaced.toLowerCase().includes(therapist.toLowerCase())) {
+      signoff = `\n${replaced}`;
+    } else {
       signoff = (s ? `\n${s}\n${therapist}` : defaultSignoff);
     }
   }
