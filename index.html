@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pnlopi_ — The Invisible Consultation Assistant</title>
+    <title>Pnlopi_: The Invisible Consultation Assistant</title>
     <meta
       name="description"
       content="Local AI that captures every detail of your beauty consultations. Secure, seamless, present."
@@ -1138,7 +1138,7 @@
             that <span class="italic-accent">matters</span>
           </h1>
           <p class="subheadline reveal" style="transition-delay: 0.2s">
-            Pnlopi_ uses local AI to capture every nuance of your beauty consultations—then
+            Pnlopi_ uses local AI to capture every nuance of your beauty consultations, then
             crafts follow-ups your clients will love. All processing happens on your device.
           </p>
 
@@ -1899,7 +1899,7 @@
         const name = normalizeClientName(clientName);
         const therapist = normalizeTherapistName(therapistName);
 
-        const subject = templateSubject || `Thank you for our consultation — ${new Date().toLocaleDateString()}`;
+        const subject = templateSubject || `Thank you for our consultation on ${new Date().toLocaleDateString()}`;
         const discussed = (notes?.discussed || []).slice(0, 2);
         const concerns = (notes?.concerns || []).slice(0, 3);
         const recommendations = (notes?.recommendations || []).slice(0, 3);
@@ -2141,8 +2141,8 @@
           if (!finRes.ok) throw new Error(finData.error || `Upload finish failed (${finRes.status})`);
           if (!finData.success) throw new Error(finData.error || "Upload failed");
 
-          // If UI stays on "Processing…" forever: the transcription worker must run on the API host —
-          // start consultation-webhook/watcher.py (or run ./start.sh there). server.py alone only creates pending jobs.
+          // If UI stays on "Processing…" forever: the transcription worker must run on the API host.
+          // Start consultation-webhook/watcher.py (or run ./start.sh there). server.py alone only creates pending jobs.
           show("processing");
           poll(finData.filename || filename);
         } catch (err) {
@@ -2175,7 +2175,7 @@
           sub.textContent =
             status === "pending"
               ? "Your upload is saved. When the worker picks it up, the steps below will advance."
-              : "Hang tight — each step updates as the server finishes it.";
+              : "Hang tight. Each step updates as the server finishes it.";
         }
         if (bar) bar.style.width = `${Math.min(100, ((idx + 1) / 4) * 100)}%`;
 
