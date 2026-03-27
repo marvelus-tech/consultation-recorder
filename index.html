@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MarvelUs — The Invisible Consultation Assistant</title>
+    <title>Pnlopi_ — The Invisible Consultation Assistant</title>
     <meta
       name="description"
       content="Local AI that captures every detail of your beauty consultations. Secure, seamless, present."
@@ -344,22 +344,6 @@
         display: flex;
         align-items: center;
         gap: 8px;
-      }
-
-      .logo-mark {
-        width: 32px;
-        height: 32px;
-        background: linear-gradient(
-          135deg,
-          var(--accent-cyan),
-          var(--accent-violet)
-        );
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        font-size: 16px;
       }
 
       .nav-links {
@@ -1132,9 +1116,8 @@
     <!-- NAVIGATION -->
     <nav id="navbar">
       <div class="container nav-content">
-        <a href="#" class="logo" aria-label="MarvelUs Home">
-          <div class="logo-mark">M</div>
-          <span>MarvelUs</span>
+        <a href="#" class="logo" aria-label="Pnlopi_ Home">
+          <span>Pnlopi_</span>
         </a>
         <div class="nav-links">
           <a href="#flow" class="nav-link">The Experience</a>
@@ -1155,7 +1138,7 @@
             that <span class="italic-accent">matters</span>
           </h1>
           <p class="subheadline reveal" style="transition-delay: 0.2s">
-            MarvelUs uses local AI to capture every nuance of your beauty consultations—then
+            Pnlopi_ uses local AI to capture every nuance of your beauty consultations—then
             crafts follow-ups your clients will love. All processing happens on your device.
           </p>
 
@@ -1237,7 +1220,7 @@
           room <span class="text-gradient">stays in the room</span>
         </h2>
         <p class="body-large reveal" style="transition-delay: 0.3s; margin: 0 auto">
-          Unlike transcription services that process audio in the cloud, MarvelUs runs
+          Unlike transcription services that process audio in the cloud, Pnlopi_ runs
           entirely on your device. Your clients' intimate concerns, medical history, and
           personal photos never touch a server. Not ours. Not anyone's.
         </p>
@@ -1348,7 +1331,7 @@
             <span class="text-gradient">Quietly powered</span>.
           </h2>
           <p class="recorder-copy reveal" style="transition-delay: 0.2s">
-            Enter the client and provider name, then tap record. When you stop, MarvelUs uploads,
+            Enter the client and provider name, then tap record. When you stop, Pnlopi_ uploads,
             processes, and returns your transcript plus a drafted follow-up.
           </p>
         </div>
@@ -1650,7 +1633,7 @@
     <!-- FOOTER -->
     <footer>
       <div class="container">
-        <p>&copy; <span id="year"></span> MarvelUs Technologies. Privacy is our foundation.</p>
+        <p>&copy; <span id="year"></span> Pnlopi_ Technologies. Privacy is our foundation.</p>
       </div>
     </footer>
 
@@ -2266,7 +2249,10 @@
                 transcript,
                 email: draftEmail,
                 clientName: data.results.clientName,
-                therapistName: document.getElementById("therapistName")?.value || "",
+                therapistName:
+                  data.results.therapistName != null && String(data.results.therapistName).length
+                    ? data.results.therapistName
+                    : document.getElementById("therapistName")?.value || "",
               });
               show("results");
               return;
