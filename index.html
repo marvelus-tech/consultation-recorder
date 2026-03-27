@@ -1491,7 +1491,7 @@
                     <div class="proc-step-icon">3</div>
                     <div class="proc-step-body">
                       <div class="proc-step-title">Draft follow-up email</div>
-                      <div class="proc-step-hint">From your transcript</div>
+                      <div class="proc-step-hint">Transcript → draft; OpenClaw can refine when handoff is enabled</div>
                     </div>
                   </div>
                   <div class="proc-step proc-step--wait" data-proc-idx="3" role="listitem">
@@ -2175,7 +2175,7 @@
         const s = String(stage || "transcribing").toLowerCase();
         if (s === "queued") return 0;
         if (s === "transcribing") return 1;
-        if (s === "drafting") return 2;
+        if (s === "drafting" || s === "openclaw_email") return 2;
         if (s === "saving") return 3;
         return 1;
       }
